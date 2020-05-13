@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">My Application</string>
     <string name="helloWorld">你好世界</string>
+    <string name="request_storage_permission">GRANT</string>
 </resources>

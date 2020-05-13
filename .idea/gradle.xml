@@ -5,10 +5,11 @@
       <GradleProjectSettings>
         <option name="distributionType" value="LOCAL" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleHome" value="W:\AndroidStudio2\gradle\gradle-4.1" />
+        <option name="gradleHome" value="E:\AndroidStudio2\gradle\gradle-4.1" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/LastmileSDK" />
             <option value="$PROJECT_DIR$/app" />
           </set>
         </option>
