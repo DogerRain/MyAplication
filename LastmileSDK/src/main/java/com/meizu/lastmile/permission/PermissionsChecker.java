@@ -18,8 +18,8 @@ public class PermissionsChecker {
     private final int RESULT_CODE_LOCATION = 0x001;
     PermissionsChecker permissionsCheckerB;
     //读写文件的权限
-    String[] permsLocation = {"android.permission.READ_EXTERNAL_STORAGE"
-            , "android.permission.WRITE_EXTERNAL_STORAGE"};
+    String[] permsLocation = {"android.com.example.huangyongwen.myapplication.service.permission.READ_EXTERNAL_STORAGE"
+            , "android.com.example.huangyongwen.myapplication.service.permission.WRITE_EXTERNAL_STORAGE"};
 
 
     public PermissionsChecker(Context context) {

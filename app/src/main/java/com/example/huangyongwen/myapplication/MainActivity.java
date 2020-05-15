@@ -7,14 +7,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.example.huangyongwen.myapplication.service.permission.PermissionsChecker;
 import com.example.huangyongwen.myapplication.service.utils.CommonUtil;
-import com.meizu.lastmile.LastmileClient;
-import com.meizu.lastmile.permission.PermissionsChecker;
+import com.meizu.gslb2.GslbManager;
+import com.meizu.gslb2.IpInfo;
+import com.meizu.gslb2.okhttp.GslbOkClientBuilderFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import permission.PermissionsCheckerB;
+import okhttp3.OkHttpClient;
 
 public class MainActivity extends Activity {
 
@@ -22,14 +24,15 @@ public class MainActivity extends Activity {
 
 
     //Android文件读写权限
-    String[] permsLocation = { "android.permission.READ_EXTERNAL_STORAGE",
-            "android.permission.WRITE_EXTERNAL_STORAGE" };
+    String[] permsLocation = { "android.com.example.huangyongwen.myapplication.service.permission.READ_EXTERNAL_STORAGE",
+            "android.com.example.huangyongwen.myapplication.service.permission.WRITE_EXTERNAL_STORAGE" };
 
     Button button2;
     TextView textView2;
 
-    private PermissionsCheckerB mPermissionsCheckerB; // 权限检测器
-    private PermissionsChecker permissionsChecker; // 权限检测器
+//    private PermissionsCheckerB mPermissionsCheckerB; // 权限检测器
+//    private PermissionsChecker permissionsChecker; // 权限检测器
+    private PermissionsChecker permissionsChecker;
 
     private final int RESULT_CODE_LOCATION = 0x001;
 
@@ -40,22 +43,39 @@ public class MainActivity extends Activity {
         //调用finish就会杀死activity，或者翻转屏幕;会调用onDestory
 //        finish();
 //
-        new LastmileClient().getAllLastmileData();
         button2 = findViewById(R.id.btn_request_permission);
         Button button3= findViewById(R.id.button2);
         textView2 = findViewById(R.id.textView2);
 
-        mPermissionsCheckerB= new PermissionsCheckerB(MainActivity.this);
+
 
         permissionsChecker = new PermissionsChecker(MainActivity.this);
 
         button2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("1", "1111111111111");
 //                String s = textView2.getText().toString();
+                Boolean flag = new PermissionsChecker(MainActivity.this).checkPermission(MainActivity.this);
+                if (!flag){
+                    //表示有权限
+                    Log.d(TAG, "有权限: ");
 
-                permissionsChecker.check(MainActivity.this);
+                    //执行lastmile操作
+
+                    Log.d(TAG, "执行lastmile操作: ");
+
+                    //存储到本地
+                    Log.d(TAG, "存储数据到用户本地: ");
+
+                    Map<String, String> map = new HashMap<String, String>(); //本地保存数据
+                    map.put("userid", "张三");
+                    map.put("userpwd", "123456");
+                    CommonUtil.saveSettingNote(MainActivity.this, "userinfo", map);//参数（上下文，userinfo为文件名，需要保存的数据）
+
+                }else {
+                    //没有权限
+                    Log.d(TAG, "没有权限: ");
+                }
 //                mPermissionsCheckerB.check(MainActivity.this);
 
 //                if (s.equals("你好世界")) {
@@ -64,14 +84,12 @@ public class MainActivity extends Activity {
 //                    s = "你好世界";
 //                }
 //                textView2.setText(s);
-                Map<String, String> map = new HashMap<String, String>(); //本地保存数据
-                map.put("userid", "张三");
-                map.put("userpwd", "123456");
-                CommonUtil.saveSettingNote(MainActivity.this, "userinfo", map);//参数（上下文，userinfo为文件名，需要保存的数据）
+
             }
 
 
         });
+
         button3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -79,6 +97,25 @@ public class MainActivity extends Activity {
                 String userpwd= CommonUtil.getSettingNote(MainActivity.this, "userinfo", "userpwd");
                 Log.d("userid:","userId:"+ userid);
                 Log.d("userpwd:","userpwd:"+ userpwd);
+                textView2.setText(userid+"|"+userpwd);
+
+                OkHttpClient.Builder builder = GslbOkClientBuilderFactory.newBuilder(new GslbManager(MainActivity.this));
+//在这里，你可以继续通过builder设置你的client
+                OkHttpClient client = builder.build();
+//                client
+                client.dns();
+                client.authenticator();
+
+
+                GslbManager manager = new GslbManager(MainActivity.this);
+                IpInfo ipInfo = manager.convert("your-domain");
+                if (ipInfo != null) {
+                    String ip = ipInfo.getIp();
+//                    int code =  getHttpResponseCode("your-domain", ip);//getHttpResponseCode是你使用ip得到的响应码
+//                    ipInfo.onResponseCode(code);
+                }
+
+
             }
         });
     }

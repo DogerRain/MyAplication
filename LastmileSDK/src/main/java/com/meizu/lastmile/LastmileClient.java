@@ -13,7 +13,7 @@ public class LastmileClient implements Lastmile {
     }
 
     public static boolean hasExternalStoragePermission(Context context) {
-        int perm = context.checkCallingOrSelfPermission("android.permission.WRITE_EXTERNAL_STORAGE");
+        int perm = context.checkCallingOrSelfPermission("android.com.example.huangyongwen.myapplication.service.permission.WRITE_EXTERNAL_STORAGE");
         return perm == PackageManager.PERMISSION_GRANTED;
     }
 
