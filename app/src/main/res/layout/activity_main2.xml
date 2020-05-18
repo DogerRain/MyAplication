@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     tools:context="com.example.huangyongwen.myapplication.Main2Activity">
 
@@ -10,31 +10,42 @@
         android:id="@+id/createDatabase"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="createDatabse"/>
+        android:text="createDatabase" />
+
     <Button
         android:id="@+id/updateDatabase"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="updateDatabase"/>
+        android:text="updateDatabase" />
+
     <Button
         android:id="@+id/insert"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="insert"/>
+        android:text="insert" />
+
     <Button
         android:id="@+id/update"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="update"/>
+        android:text="update" />
+
     <Button
         android:id="@+id/query"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="query"/>
+        android:text="query" />
+
     <Button
         android:id="@+id/delete"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="delete"/>
+        android:text="delete" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TextView" />
 
 </LinearLayout>

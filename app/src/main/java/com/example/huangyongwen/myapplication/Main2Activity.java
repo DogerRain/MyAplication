@@ -26,6 +26,7 @@ public class Main2Activity extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
+        findViews();
     }
 
 
@@ -49,9 +50,11 @@ public class Main2Activity extends Activity implements View.OnClickListener {
     @Override
     public void onClick(View v) {
 // 判断所触发的被监听控件，并执行命令
+        Log.i("Tag:","监控点击事件");
         switch (v.getId()) {
             //创建数据库
             case R.id.createDatabase:
+                Log.i("Tag:","创建数据库");
                 //创建一个DatabaseHelper对象
                 DatabaseHelper dbHelper1 = new DatabaseHelper(Main2Activity.this, "test_db");
                 //取得一个只读的数据库对象

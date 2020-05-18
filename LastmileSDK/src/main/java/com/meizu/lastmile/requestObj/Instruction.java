@@ -1,11 +1,13 @@
 package com.meizu.lastmile.requestObj;
 
+import lombok.Data;
+
 /**
  * @Author: huangyongwen
  * @CreateDate: 2020/5/18 17:42
  * @CreateDate:
  */
-
+@Data
 public class Instruction {
     /**
      * 名称

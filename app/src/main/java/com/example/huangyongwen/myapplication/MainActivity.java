@@ -10,14 +10,9 @@ import android.widget.TextView;
 
 import com.example.huangyongwen.myapplication.permission.PermissionsChecker;
 import com.example.huangyongwen.myapplication.utils.CommonUtil;
-import com.meizu.gslb2.GslbManager;
-import com.meizu.gslb2.IpInfo;
-import com.meizu.gslb2.okhttp.GslbOkClientBuilderFactory;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import okhttp3.OkHttpClient;
 
 public class MainActivity extends Activity {
 
@@ -99,7 +94,7 @@ public class MainActivity extends Activity {
                 Log.d("userid:", "userId:" + userid);
                 Log.d("userpwd:", "userpwd:" + userpwd);
                 textView2.setText(userid + "|" + userpwd);
-
+/*
                 OkHttpClient.Builder builder = GslbOkClientBuilderFactory.newBuilder(new GslbManager(MainActivity.this));
 //在这里，你可以继续通过builder设置你的client
                 OkHttpClient client = builder.build();
@@ -114,7 +109,7 @@ public class MainActivity extends Activity {
                     String ip = ipInfo.getIp();
 //                    int code =  getHttpResponseCode("your-domain", ip);//getHttpResponseCode是你使用ip得到的响应码
 //                    ipInfo.onResponseCode(code);
-                }
+                }*/
 
 
             }
