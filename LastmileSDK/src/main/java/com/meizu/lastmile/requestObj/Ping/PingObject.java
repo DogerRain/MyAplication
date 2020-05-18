@@ -7,4 +7,5 @@ package com.meizu.lastmile.requestObj.Ping;
  */
 
 public class PingObject {
+
 }
