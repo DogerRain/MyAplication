@@ -1,14 +1,15 @@
 package com.example.huangyongwen.myapplication;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.example.huangyongwen.myapplication.service.permission.PermissionsChecker;
-import com.example.huangyongwen.myapplication.service.utils.CommonUtil;
+import com.example.huangyongwen.myapplication.permission.PermissionsChecker;
+import com.example.huangyongwen.myapplication.utils.CommonUtil;
 import com.meizu.gslb2.GslbManager;
 import com.meizu.gslb2.IpInfo;
 import com.meizu.gslb2.okhttp.GslbOkClientBuilderFactory;
@@ -24,13 +25,13 @@ public class MainActivity extends Activity {
 
 
     //Android文件读写权限
-    String[] permsLocation = { "android.com.example.huangyongwen.myapplication.service.permission.READ_EXTERNAL_STORAGE",
-            "android.com.example.huangyongwen.myapplication.service.permission.WRITE_EXTERNAL_STORAGE" };
+    String[] permsLocation = {"android.permission.READ_EXTERNAL_STORAGE",
+            "android.permission.WRITE_EXTERNAL_STORAGE"};
 
-    Button button2;
+    Button button2, button4;
     TextView textView2;
 
-//    private PermissionsCheckerB mPermissionsCheckerB; // 权限检测器
+    //    private PermissionsCheckerB mPermissionsCheckerB; // 权限检测器
 //    private PermissionsChecker permissionsChecker; // 权限检测器
     private PermissionsChecker permissionsChecker;
 
@@ -44,9 +45,9 @@ public class MainActivity extends Activity {
 //        finish();
 //
         button2 = findViewById(R.id.btn_request_permission);
-        Button button3= findViewById(R.id.button2);
+        button4 = findViewById(R.id.button4);
+        Button button3 = findViewById(R.id.button2);
         textView2 = findViewById(R.id.textView2);
-
 
 
         permissionsChecker = new PermissionsChecker(MainActivity.this);
@@ -56,7 +57,7 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
 //                String s = textView2.getText().toString();
                 Boolean flag = new PermissionsChecker(MainActivity.this).checkPermission(MainActivity.this);
-                if (!flag){
+                if (!flag) {
                     //表示有权限
                     Log.d(TAG, "有权限: ");
 
@@ -72,7 +73,7 @@ public class MainActivity extends Activity {
                     map.put("userpwd", "123456");
                     CommonUtil.saveSettingNote(MainActivity.this, "userinfo", map);//参数（上下文，userinfo为文件名，需要保存的数据）
 
-                }else {
+                } else {
                     //没有权限
                     Log.d(TAG, "没有权限: ");
                 }
@@ -93,11 +94,11 @@ public class MainActivity extends Activity {
         button3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String userid= CommonUtil.getSettingNote(MainActivity.this, "userinfo", "userid");
-                String userpwd= CommonUtil.getSettingNote(MainActivity.this, "userinfo", "userpwd");
-                Log.d("userid:","userId:"+ userid);
-                Log.d("userpwd:","userpwd:"+ userpwd);
-                textView2.setText(userid+"|"+userpwd);
+                String userid = CommonUtil.getSettingNote(MainActivity.this, "userinfo", "userid");
+                String userpwd = CommonUtil.getSettingNote(MainActivity.this, "userinfo", "userpwd");
+                Log.d("userid:", "userId:" + userid);
+                Log.d("userpwd:", "userpwd:" + userpwd);
+                textView2.setText(userid + "|" + userpwd);
 
                 OkHttpClient.Builder builder = GslbOkClientBuilderFactory.newBuilder(new GslbManager(MainActivity.this));
 //在这里，你可以继续通过builder设置你的client
@@ -118,6 +119,22 @@ public class MainActivity extends Activity {
 
             }
         });
+
+        button4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(TAG,"按道理进入方法了");
+                Intent intent = new Intent();
+                //setClass函数的第一个参数是一个Context对象
+                //Context是一个类，Activity是Context类的子类，也就是说，所有的Activity对象，都可以向上转型为Context对象
+                //setClass函数的第二个参数是一个Class对象，在当前场景下，应该传入需要被启动的Activity类的class对象
+                intent.setClass(MainActivity.this, Main2Activity.class);
+                startActivity(intent);
+
+            }
+        });
+
+
     }
 
 

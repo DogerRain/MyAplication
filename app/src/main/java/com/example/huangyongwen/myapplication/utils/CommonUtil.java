@@ -1,4 +1,4 @@
-package com.example.huangyongwen.myapplication.service.utils;
+package com.example.huangyongwen.myapplication.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;

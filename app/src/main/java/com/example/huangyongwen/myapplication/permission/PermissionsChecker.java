@@ -1,4 +1,4 @@
-package com.example.huangyongwen.myapplication.service.permission;
+package com.example.huangyongwen.myapplication.permission;
 
 import android.app.Activity;
 import android.content.Context;
