@@ -9,14 +9,9 @@ import android.widget.TextView;
 
 import com.example.huangyongwen.myapplication.service.permission.PermissionsChecker;
 import com.example.huangyongwen.myapplication.service.utils.CommonUtil;
-import com.meizu.gslb2.GslbManager;
-import com.meizu.gslb2.IpInfo;
-import com.meizu.gslb2.okhttp.GslbOkClientBuilderFactory;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import okhttp3.OkHttpClient;
 
 public class MainActivity extends Activity {
 
@@ -54,7 +49,6 @@ public class MainActivity extends Activity {
         button2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                String s = textView2.getText().toString();
                 Boolean flag = new PermissionsChecker(MainActivity.this).checkPermission(MainActivity.this);
                 if (!flag){
                     //表示有权限
@@ -78,12 +72,7 @@ public class MainActivity extends Activity {
                 }
 //                mPermissionsCheckerB.check(MainActivity.this);
 
-//                if (s.equals("你好世界")) {
-//                    s = "HelloWorld";
-//                } else {
-//                    s = "你好世界";
-//                }
-//                textView2.setText(s);
+//
 
             }
 
@@ -99,7 +88,7 @@ public class MainActivity extends Activity {
                 Log.d("userpwd:","userpwd:"+ userpwd);
                 textView2.setText(userid+"|"+userpwd);
 
-                OkHttpClient.Builder builder = GslbOkClientBuilderFactory.newBuilder(new GslbManager(MainActivity.this));
+              /*  OkHttpClient.Builder builder = GslbOkClientBuilderFactory.newBuilder(new GslbManager(MainActivity.this));
 //在这里，你可以继续通过builder设置你的client
                 OkHttpClient client = builder.build();
 //                client
@@ -113,9 +102,17 @@ public class MainActivity extends Activity {
                     String ip = ipInfo.getIp();
 //                    int code =  getHttpResponseCode("your-domain", ip);//getHttpResponseCode是你使用ip得到的响应码
 //                    ipInfo.onResponseCode(code);
+                }*/
+
+
+                String s = textView2.getText().toString();
+
+                if (s.equals("你好世界")) {
+                    s = "HelloWorld";
+                } else {
+                    s = "你好世界";
                 }
-
-
+                textView2.setText(s);
             }
         });
     }
