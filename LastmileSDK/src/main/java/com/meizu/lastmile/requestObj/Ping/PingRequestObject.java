@@ -2,10 +2,8 @@ package com.meizu.lastmile.requestObj.Ping;
 
 import com.meizu.lastmile.requestObj.Instruction;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * @Author: huangyongwen
@@ -15,6 +13,18 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class PingRequestObject extends Instruction{
+    /**
+     * 超时时间 默认 1000ms
+     */
+    String timeout;
+    /**
+     * 发送数据包次数 默认4次
+     */
+    String count ;
+    /**
+     * 指定数据包大小，默认 64Byte
+     */
+    String packageSize;
     String ip;
     String hostName;
 }

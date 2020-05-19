@@ -11,6 +11,19 @@ import lombok.Data;
 @Data
 @Builder
 public class PingResponseObject {
-    String delayedTime;
+    /**
+     * 平均延时
+     */
+    String avgDelayedTime;
+    String minDelayedTime;
+    String maxDelayedTime;
+    /**
+     * 平均偏差
+     */
+    String mdevDelayedTime;
+    /**
+     * 发送耗时
+     */
+    String sendUsedTime;
     String packetLossRate;
 }

@@ -12,7 +12,7 @@ android {
         jackOptions {
             enabled true
         }
-}
+    }
     buildTypes {
         release {
             minifyEnabled false
@@ -58,4 +58,9 @@ dependencies {
     }
     compile 'com.squareup.okhttp3:okhttp:3.9.0'
     //    compile 'com.meizu.flyme.internet:gslb-okhttp2:2.2.1'
+//    dependencies {
+//        compile(name:'app-release', ext:'aar')
+//    }
+        compile(name: 'LastmileSDK-release', ext: 'aar')
 }
+

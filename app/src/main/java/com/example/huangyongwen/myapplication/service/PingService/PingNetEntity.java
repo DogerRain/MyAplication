@@ -1,4 +1,4 @@
-package lastmile.meizu.com.lastmile;
+package com.example.huangyongwen.myapplication.service.PingService;
 
 /**
  * @Author： Administrator

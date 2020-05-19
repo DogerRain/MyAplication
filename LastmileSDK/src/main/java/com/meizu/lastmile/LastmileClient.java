@@ -6,7 +6,13 @@ package com.meizu.lastmile;
 
 public class LastmileClient implements Lastmile {
 
+    @Override
     public void reviceInstructions(){
+//        new PingService().
+    }
+
+    @Override
+    public void getLastestTask() {
 
     }
 

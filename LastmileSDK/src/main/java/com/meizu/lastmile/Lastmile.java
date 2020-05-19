@@ -5,4 +5,9 @@ package com.meizu.lastmile;
  */
 
 public interface Lastmile {
+
+    public void reviceInstructions();
+
+
+    public void getLastestTask();
 }

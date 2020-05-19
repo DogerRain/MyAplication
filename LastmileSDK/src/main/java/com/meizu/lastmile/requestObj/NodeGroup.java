@@ -1,5 +1,7 @@
 package com.meizu.lastmile.requestObj;
 
+import java.util.List;
+
 /**
  * @Author: huangyongwen
  * @CreateDate: 2020/5/18 18:03
@@ -30,7 +32,7 @@ public class NodeGroup {
     /**
      * 城市
      */
-    String city;
+    List<String> city;
 
     /**
      * 节点数

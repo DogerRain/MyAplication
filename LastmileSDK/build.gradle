@@ -12,12 +12,17 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
     }
+    lintOptions {
+        abortOnError false
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
     buildToolsVersion '26.0.1'
     productFlavors {
     }
@@ -40,7 +45,12 @@ dependencies {
     }
     compile 'com.squareup.okhttp3:okhttp:3.9.0'
     //    compile 'com.meizu.flyme.internet:gslb-okhttp2:2.2.1'
+    compile(group: 'com.meizu.statsapp', name: 'MzUsageStats', version: '3.2.5', ext: 'aar')
     compile 'org.projectlombok:lombok:1.16.6'
+// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+
+
 }
 
 
@@ -49,7 +59,7 @@ dependencies {
 
 task makeJar(type:Copy) {
 //删除存在的jar
-    delete "build/lib/lastmileSDK-1.0.jar"
+    delete "build/libs/lastmileSDK-1.0.jar"
 //设置拷贝文件
     from("build/intermediates/bundles/release")
 //打进jar后文件目录
