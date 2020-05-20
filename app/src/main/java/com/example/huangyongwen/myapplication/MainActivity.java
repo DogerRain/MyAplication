@@ -128,7 +128,7 @@ public class MainActivity extends Activity {
                 //setClass函数的第二个参数是一个Class对象，在当前场景下，应该传入需要被启动的Activity类的class对象
                 intent.setClass(MainActivity.this, Main2Activity.class);
                 startActivity(intent);
-                new PingService().getPingInfo(null);
+                new PingService().receiveInstructionAndStorage(null,MainActivity.this);
             }
         });
 

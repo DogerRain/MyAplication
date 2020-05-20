@@ -1,5 +1,6 @@
 package com.meizu.lastmile.Utils;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -18,6 +19,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int VERSION = 1;
     private static final String SWORD = "SWORD";
 
+    private static final String databaseName = "lastmile";
+
+
+    private SQLiteDatabase sqLiteDatabase = null;
+
+    public void setSqLiteDatabase(SQLiteDatabase db) {
+        this.sqLiteDatabase = db;
+    }
+
+    public SQLiteDatabase getSqLiteDatabase() {
+        return sqLiteDatabase;
+    }
+
+
     //三个不同参数的构造函数
     //带全部参数的构造函数，此构造函数必不可少
     public DatabaseHelper(Context context, String name, CursorFactory factory,
@@ -26,9 +41,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     //带两个参数的构造函数，调用的其实是带三个参数的构造函数
-    public DatabaseHelper(Context context, String name) {
-        this(context, name, VERSION);
+    public DatabaseHelper(Context context) {
+        this(context, databaseName, VERSION);
     }
+
 
     //带三个参数的构造函数，调用的是带所有参数的构造函数
     public DatabaseHelper(Context context, String name, int version) {
@@ -64,8 +80,61 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return false;
     }
 
-    public void createTable(SQLiteDatabase db , String sql){
-        db.execSQL(sql );
+    public void createTable(SQLiteDatabase db, String sql) {
+        db.execSQL(sql);
+    }
+
+    /**
+     * 插入sql
+     * @param db
+     * @param tableName
+     * @param values
+     */
+
+    public void insert(SQLiteDatabase db, String tableName, ContentValues values) {
+        //数据库执行插入命令
+        db.insert(tableName, null, values);
+    }
+
+    /**
+     * 更新
+     *
+     * @param db
+     * @param tableName
+     * @param values
+     */
+    public void update(SQLiteDatabase db, String tableName, ContentValues values) {
+
+        db.update("user", values, "id=?", new String[]{"1"});
+    }
+
+    /**
+     * 删除
+     *
+     * @param db
+     * @param tableName
+     * @param values
+     */
+    public void delete(SQLiteDatabase db, String tableName, String[] values) {
+
+        db.delete(tableName, "id=? ", values);
+    }
+
+//    public void exceCustomSQL(SQLiteDatabase db, String sql) {
+//        db.execSQL();
+//    }
+
+
+    public Boolean queryTaskIdSQL(SQLiteDatabase db, String sql, String[] selectionArgs) {
+        Cursor cursor = db.rawQuery(sql, selectionArgs);
+        Boolean flag = false;
+        if (cursor.getCount() > 0) {
+            flag = true;
+        }
+        if (cursor != null) {
+            cursor.close();
+        }
+        return flag;
     }
 
 }

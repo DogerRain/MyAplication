@@ -2,8 +2,10 @@ package com.meizu.lastmile.requestObj.Ping;
 
 import com.meizu.lastmile.requestObj.Instruction;
 
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * @Author: huangyongwen
@@ -11,8 +13,13 @@ import lombok.Data;
  * @CreateDate:
  */
 @Data
-@Builder
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
 public class PingRequestObject extends Instruction{
+
+    String pingTaskId;
+
     /**
      * 超时时间 默认 1000ms
      */
@@ -27,4 +34,29 @@ public class PingRequestObject extends Instruction{
     String packageSize;
     String ip;
     String hostName;
+
+
+
+
+
+
+
+    /**
+     * 上一次执行时间
+     */
+    String lastExecuteTime;
+
+    /**
+     * 执行频率，单位 小时
+     */
+//    String frequency;
+
+
+    /**
+     * 监测计划
+     */
+
+
+
+
 }
