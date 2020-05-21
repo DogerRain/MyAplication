@@ -1,6 +1,4 @@
-package com.meizu.lastmile.requestObj.Ping;
-
-import com.meizu.lastmile.requestObj.Instruction;
+package com.meizu.lastmile.requestObj;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,12 +16,6 @@ import lombok.ToString;
 @NoArgsConstructor
 public class PingRequestObject extends Instruction{
 
-    String pingTaskId;
-
-    /**
-     * 超时时间 默认 1000ms
-     */
-    String timeout;
     /**
      * 发送数据包次数 默认4次
      */
@@ -32,12 +24,10 @@ public class PingRequestObject extends Instruction{
      * 指定数据包大小，默认 64Byte
      */
     String packageSize;
-    String ip;
+
+    String host;
+
     String hostName;
-
-
-
-
 
 
 
@@ -55,7 +45,6 @@ public class PingRequestObject extends Instruction{
     /**
      * 监测计划
      */
-
 
 
 

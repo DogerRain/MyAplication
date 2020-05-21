@@ -8,13 +8,16 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.meizu.lastmile.Utils.DatabaseHelper;
-import com.meizu.lastmile.requestObj.NodeGroup;
-import com.meizu.lastmile.requestObj.Ping.PingRequestObject;
+import com.meizu.lastmile.requestObj.Group;
+import com.meizu.lastmile.requestObj.PingRequestObject;
 import com.meizu.lastmile.responseObj.PingResponseObject;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,14 +32,14 @@ public class PingService {
         if (pingRequestObject == null) {
             return null;
         }
-        if (StringUtils.isBlank(pingRequestObject.getIp())
+        if (StringUtils.isBlank(pingRequestObject.getHost())
                 && StringUtils.isBlank(pingRequestObject.getHostName())
                 ) {
             return null;
         }
 
         //任务id
-        String pingTaskId = pingRequestObject.getPingTaskId();
+        String pingTaskId = pingRequestObject.getTaskId();
         if (StringUtils.isBlank(pingTaskId)) {
             return null;
         }
@@ -66,7 +69,7 @@ public class PingService {
                 "status INTEGER default 1)";
 
 
-        String target = pingRequestObject.getIp() != null ? pingRequestObject.getIp() : pingRequestObject.getHostName();
+        String target = pingRequestObject.getHost() != null ? pingRequestObject.getHost() : pingRequestObject.getHostName();
 
         StringBuffer command = new StringBuffer();
         command.append("ping " + target);
@@ -91,28 +94,28 @@ public class PingService {
         //插入任务
         ContentValues values = new ContentValues();
         //像ContentValues中存放数据
-        values.put("id", pingRequestObject.getPingTaskId());
+    /*    values.put("id", pingRequestObject.getPingTaskId());
         values.put("timeout", pingRequestObject.getTimeout());
         values.put("count", pingRequestObject.getCount());
         values.put("packageSize", pingRequestObject.getPackageSize());
         values.put("ip", pingRequestObject.getIp());
         values.put("hostName", pingRequestObject.getHostName());
-        values.put("lastExecuteTime", pingRequestObject.getLastExecuteTime());
+        values.put("lastExecuteTime", pingRequestObject.getLastExecuteTime());*/
 
 
-        values.put("monitorName", pingRequestObject.getMonitorName());
+       /* values.put("monitorName", pingRequestObject.getMonitorName());
         values.put("monitorType", pingRequestObject.getMonitorType());
         values.put("monitorOption", pingRequestObject.getMonitorOption());
         values.put("validTimeStart", pingRequestObject.getValidTimeStart());
         values.put("validTimeEnd", pingRequestObject.getValidTimeEnd());
         String nodeGroup = JSON.toJSONString(pingRequestObject.getNodeGroup());
         values.put("nodeGroup", nodeGroup);
+*/
 
-
-        values.put("monitorFrequency", pingRequestObject.getMonitorFrequency());
+      /*  values.put("monitorFrequency", pingRequestObject.getMonitorFrequency());
         values.put("executeTimeStart", pingRequestObject.getExecuteTimeStart());
         values.put("executeTimeEnd", pingRequestObject.getExecuteTimeEnd());
-        values.put("IsExecute", pingRequestObject.getIsExecute());
+        values.put("IsExecute", pingRequestObject.getIsExecute());*/
 
 
         //2. 获取表是否存在，不存在则创建
@@ -141,16 +144,31 @@ public class PingService {
         return null;
     }
 
+
+    public void getLocalPingTask(){
+
+    }
+
+
     public static void main(String[] args) throws IOException, InterruptedException {
         PingRequestObject pingRequestObject = new PingRequestObject();
         List<String> city = new ArrayList<>();
         city.add("HN");
         city.add("GZ");
-        NodeGroup nodeGroup = NodeGroup.builder().nodeGroupCount(1).nodeGroupName("2").city(city).build();
-        pingRequestObject.setNodeGroup(nodeGroup);
+        List<Group> group = new ArrayList<>();
+        group.add(Group.builder().groupCount(1).idc("2").citis(city).build());
+        pingRequestObject.setGroups(group);
 
         JSONObject jsonObj = (JSONObject) JSON.toJSON(pingRequestObject);
         String rest = JSON.toJSONString(jsonObj, SerializerFeature.WriteMapNullValue);
         System.out.println(rest);
+
+        try {
+            InetAddress ip4 = Inet4Address.getLocalHost();
+            System.out.println(ip4.getHostAddress());
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+
     }
 }

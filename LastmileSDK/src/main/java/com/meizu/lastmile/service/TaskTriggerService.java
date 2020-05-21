@@ -10,25 +10,47 @@ import com.meizu.lastmile.Utils.CommonUtils;
  * @Description: 任务触发service
  */
 
-public class TaskTriggerService {
+public class TaskTriggerService extends Thread {
 
-    public void startPingTask(Context context) {
 
-        //1.判断是否处于WIFI
-        if (CommonUtils.WifiConnected(context)) {
-            startPingTask();
-        } else {
-            // 判断是否处于网络可用
-            if (CommonUtils.NetworkConnected(context)) {
+    public void startTask(Context context) {
+        int flag = CommonUtils.getNetWorkStart(context);
 
-            }
-
+        switch (flag) {
+            case CommonUtils.NETWORW_WIFI:
+                startPingTask(context);
+                startSingleWebTask(context);
+                startFileDownloadTask(context);
+                break;
+            case CommonUtils.NETWORK_MOBILE:
+                startPingTask(context);
+                break;
+            default:
+                break;
         }
-
-        //3. 判断是否有任务
     }
 
-    private void startPingTask(){
+
+    /**
+     * 启动ping任务
+     */
+    private void startPingTask(Context context) {
 
     }
+
+
+    /**
+     * 启动curl任务
+     */
+    private void startSingleWebTask(Context context) {
+
+    }
+
+    /**
+     * 启动curl任务
+     */
+    private void startFileDownloadTask(Context context) {
+
+    }
+
 }
