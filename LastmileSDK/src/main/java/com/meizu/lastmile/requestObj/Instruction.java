@@ -2,6 +2,8 @@ package com.meizu.lastmile.requestObj;
 
 import java.util.List;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,12 +13,19 @@ import lombok.NoArgsConstructor;
  * @CreateDate: 请求公共参数
  */
 @Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor(suppressConstructorProperties = true)
 public class Instruction {
     /**
      * 任务Id
      */
     String taskId;
+
+    /**
+     * 监测类型
+     */
+    String taskType;
 
     /**
      * 名称
@@ -27,24 +36,12 @@ public class Instruction {
      * 节点组
      */
     List<Group> groups;
-    /**
-     * 超时时间
-     */
-    String timeout;
 
-    /**
-     * Ping操作参数
-     */
-    List<Ping> ping;
+
 
     //额外参数，暂时不写
 
 
-
-    /**
-     * 监测频率
-     */
-    String monitorFrequency;
 
     /**
      * 监测计划，设置监测频率的同时亦可设定监测计划，
@@ -58,18 +55,9 @@ public class Instruction {
     /**
      * 是否在执行计划执行，true表示仅在执行计划执行，false表示 在执行计划 外执行
      */
-    boolean IsExecute;
+    Boolean IsExecute;
 
 
-
-    /**
-     * 监测类型
-     */
-    String taskType;
-    /**
-     * 监测选项
-     */
-    String monitorOption;
     /**
      * 有效期
      */

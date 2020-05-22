@@ -8,10 +8,14 @@ import android.content.Context;
 
 public interface Lastmile {
 
-    public void reviceInstructions();
+    public void reviceInstructions(String content);
 
-
-    public void getLastestTask();
+    /**
+     * 参数待定
+     *
+     * @param content
+     */
+    public void getLastestTask(String content);
 
     public void startTask(Context context);
 }

@@ -8,6 +8,11 @@ import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * @Author: huangyongwen
  * @CreateDate: 2020/5/18 15:55
@@ -86,6 +91,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * 插入sql
+     *
      * @param db
      * @param tableName
      * @param values
@@ -103,9 +109,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param tableName
      * @param values
      */
-    public void update(SQLiteDatabase db, String tableName, ContentValues values) {
-
-        db.update("user", values, "id=?", new String[]{"1"});
+    public void update(SQLiteDatabase db, String tableName, ContentValues values, String[] taskId) {
+        db.update(tableName, values, "taskId=?", taskId);
     }
 
     /**
@@ -117,7 +122,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public void delete(SQLiteDatabase db, String tableName, String[] values) {
 
-        db.delete(tableName, "id=? ", values);
+        db.delete(tableName, "taskId=? ", values);
     }
 
 //    public void exceCustomSQL(SQLiteDatabase db, String sql) {
@@ -135,6 +140,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cursor.close();
         }
         return flag;
+    }
+
+    /**
+     * @param db
+     * @param tableName
+     * @param selectColumnName 查询的列名 new String[]{"taskId"}
+     * @param slection         "taskId=? and XXX=?"
+     * @param condition        占位符
+     * @return
+     */
+    public List<Map<String, String>> queryTask(SQLiteDatabase db, String tableName, String[] selectColumnName, String slection, String[] condition) {
+        //创建游标对象
+        Cursor cursor = db.query(tableName, selectColumnName, slection, condition, null, null, null, null);
+        List<Map<String, String>> list = new ArrayList<>();
+        //利用游标遍历所有数据对象
+        while (cursor.moveToNext()) {
+            Map<String, String> hashMap = new HashMap<>();
+            for (String s : selectColumnName) {
+                String value = cursor.getString(cursor.getColumnIndex(s)) + "";
+                hashMap.put(s, value);
+            }
+            list.add(hashMap);
+        }
+        return list;
     }
 
 }

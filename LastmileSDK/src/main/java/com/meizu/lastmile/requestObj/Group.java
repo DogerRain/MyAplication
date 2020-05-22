@@ -2,7 +2,6 @@ package com.meizu.lastmile.requestObj;
 
 import java.util.List;
 
-import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -11,7 +10,9 @@ import lombok.Data;
  * @CreateDate:
  */
 @Data
-@Builder
+//@Builder
+//@NoArgsConstructor
+//@AllArgsConstructor
 public class Group {
     /**
      * 名称
@@ -24,7 +25,7 @@ public class Group {
     /**
      * 城市
      */
-    List<String> citis;
+    List<String> cities;
 
 
     /**
