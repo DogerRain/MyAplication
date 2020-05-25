@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -137,11 +139,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 //    }
 
 
-    public Boolean queryTaskIdSQL(SQLiteDatabase db, String sql, String[] selectionArgs) {
-        Cursor cursor = db.rawQuery(sql, selectionArgs);
+    public Boolean queryTaskIdSQL(SQLiteDatabase db, String tableName, String[] selectColumnName, String slection, String[] condition) {
+//        Cursor cursor = db.rawQuery(sql, selectionArgs);
+        Cursor cursor = db.query(tableName, selectColumnName, slection, condition, null, null, null, "1");
         Boolean flag = false;
-        if (cursor.getCount() > 0) {
-            flag = true;
+        while (cursor.moveToNext()) {
+            String taskId = cursor.getString(cursor.getColumnIndex("taskId"));
+            if (StringUtils.isNotBlank(taskId)) {
+                flag = true;
+            }
         }
         if (cursor != null) {
             cursor.close();
@@ -151,7 +157,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * @param db
-     * @param tableName
+     * @param tableName        t_ping
      * @param selectColumnName 查询的列名 new String[]{"taskId"}
      * @param slection         "taskId=? and XXX=?"
      * @param condition        占位符

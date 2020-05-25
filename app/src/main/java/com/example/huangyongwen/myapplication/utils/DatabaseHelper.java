@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.util.Log;
 
+import com.meizu.lastmile.Utils.ConstantUtils;
+
 /**
  * @Author: huangyongwen
  * @CreateDate: 2020/5/18 15:55
@@ -35,9 +37,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         Log.i(SWORD,"create a Database");
         //创建数据库sql语句
-        String sql = "create table user(id int,name varchar(20))";
+//        db.execSQL("DROP TABLE IF NOT EXISTS " + "user1");
+        String sql = "create table user1(id int,name varchar(20),test1 varchar(30))";
+        db.execSQL("create table person (_id integer primary key autoincrement, " +
+                "name char(10), phone char(20), money integer(20))");
         //执行创建数据库操作
-//        db.execSQL(sql);
+        db.execSQL("insert into person (name, phone, money) values (?, ?, ?);",
+                new Object[]{"张三", 15987461, 75000});
+        db.execSQL(sql);
     }
 
     @Override

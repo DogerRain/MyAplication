@@ -75,7 +75,7 @@ public class Main2Activity extends Activity implements View.OnClickListener {
                 DatabaseHelper dbHelper1 = new DatabaseHelper(Main2Activity.this, "test_db");
                 //取得一个只读的数据库对象
                 SQLiteDatabase db1 = dbHelper1.getWritableDatabase();
-                db1.execSQL("create table user(id int,name varchar(20))");
+//                db1.execSQL("create table user(id int,name varchar(20))");
                 break;
             //更新数据库
             case R.id.updateDatabase:

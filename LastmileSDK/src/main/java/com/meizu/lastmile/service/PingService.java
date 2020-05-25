@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
+import com.meizu.lastmile.Utils.CommonUtils;
 import com.meizu.lastmile.Utils.ConstantUtils;
 import com.meizu.lastmile.Utils.DatabaseHelper;
 import com.meizu.lastmile.requestObj.PingRequestObject;
@@ -56,8 +57,8 @@ public class PingService extends Thread {
         }
 
         //任务id
-        String pingTaskId = pingRequestObject.getTaskId();
-        if (StringUtils.isBlank(pingTaskId)) {
+        String taskId = pingRequestObject.getTaskId();
+        if (StringUtils.isBlank(taskId)) {
             return;
         }
 
@@ -66,8 +67,7 @@ public class PingService extends Thread {
 
 
         String tableStructure = "create table " + ConstantUtils.T_PING + "(" +
-//                "pingTaskId INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "taskId int PRIMARY KEY NOT NULL," +
+                "taskId varchar(50) PRIMARY KEY NOT NULL," +
                 "taskType varchar(50)," +
                 "timeout varchar(10)," +
                 "count varchar(10)," +
@@ -82,9 +82,14 @@ public class PingService extends Thread {
                 "lastExecuteTime varchar(30)," +
 
                 "expireFrom varchar(30)," +
-//                "expireTo varchar(30)," +
+                "expireTo varchar(30)," +
+                "monitorFrequency varchar(30)," +
 
-                "expireTo varchar(30))" ;
+                "executeTimeStart varchar(30)," +
+                "executeTimeEnd varchar(30)," +
+                "IsExecute varchar(5)," +
+                "status int NOT NULL default 1" +
+                ")";
 
 //                "status int default 1)";
 
@@ -103,7 +108,7 @@ public class PingService extends Thread {
         command.append(" -i " + pingRequestObject.getInterval());
 
         //1. 获取本地数据库
-        DatabaseHelper dbHelper1 = new DatabaseHelper(context,tableStructure);
+        DatabaseHelper dbHelper1 = new DatabaseHelper(context);
         //取得一个的数据库对象
         SQLiteDatabase db1 = dbHelper1.getWritableDatabase();
         try {
@@ -123,7 +128,6 @@ public class PingService extends Thread {
             values.put("supportIPv6", pingRequestObject.getSupportIPv6());
             values.put("dnsMatch", pingRequestObject.getDnsMatch());
             values.put("lastExecuteTime", pingRequestObject.getLastExecuteTime());
-
             values.put("expireFrom", pingRequestObject.getExpireFrom());
             values.put("expireTo", pingRequestObject.getExpireTo());
 
@@ -134,18 +138,19 @@ public class PingService extends Thread {
 
 
             //2. 获取表是否存在，不存在则创建
-            if (!dbHelper1.isTableExist(db1, "user")) {
-//            if (!dbHelper1.isTableExist(db1, ConstantUtils.T_PING)) {
-                Log.i(TAG,"创建表。。。。。");
+            if (!dbHelper1.isTableExist(db1, ConstantUtils.T_PING)) {
+                Log.i(TAG, "创建表。。。。。");
                 dbHelper1.createTable(db1, tableStructure);
             }
 
             //3.查任务是否存在
-            String queryTaskIdSQL = "select pingTaskId from ? where taskId= ? ";
-            Boolean IsHasTaskId = dbHelper1.queryTaskIdSQL(db1, queryTaskIdSQL, new String[]{ConstantUtils.T_PING, pingTaskId});
+//            String queryTaskIdSQL = "select * from " + ConstantUtils.T_PING + " where taskId=?";
+            String[] placeholderValues = new String[]{taskId};
+            String selection = "taskId=?";
+            Boolean IsHasTaskId = dbHelper1.queryTaskIdSQL(db1, ConstantUtils.T_PING, new String[]{"taskId"}, selection, placeholderValues);
             if (IsHasTaskId) {
                 //已经存在任务，更新任务
-                String[] condition = new String[]{pingTaskId};
+                String[] condition = new String[]{taskId};
                 dbHelper1.update(db1, ConstantUtils.T_PING, values, condition);
             } else {
                 //不存在任务，插入任务
@@ -153,7 +158,7 @@ public class PingService extends Thread {
             }
 
         } catch (Exception e) {
-            Log.e(TAG, "创建本地任务失败");
+            Log.e(TAG, e.toString());
         } finally {
             //关闭数据库
             if (db1 != null) {
