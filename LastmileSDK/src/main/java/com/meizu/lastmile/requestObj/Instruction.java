@@ -13,9 +13,6 @@ import lombok.NoArgsConstructor;
  * @CreateDate: 请求公共参数
  */
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor(suppressConstructorProperties = true)
 public class Instruction {
     /**
      * 任务Id

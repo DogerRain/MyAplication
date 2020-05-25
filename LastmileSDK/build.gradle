@@ -4,12 +4,13 @@ apply plugin: 'com.android.library'
 android {
     compileSdkVersion 29
     defaultConfig {
-        minSdkVersion 18
+        minSdkVersion 15
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        javaCompileOptions { annotationProcessorOptions { includeCompileClasspath = true } }
 
     }
     lintOptions {
@@ -23,10 +24,12 @@ android {
         }
     }
 
-    buildToolsVersion '26.0.1'
+    buildToolsVersion '26.0.2'
     productFlavors {
     }
     compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
     }
 }
 
@@ -45,14 +48,14 @@ dependencies {
     }
     compile 'com.squareup.okhttp3:okhttp:3.9.0'
     //    compile 'com.meizu.flyme.internet:gslb-okhttp2:2.2.1'
-    compile(group: 'com.meizu.statsapp', name: 'MzUsageStats', version: '3.2.5', ext: 'aar')
+    //    compile(group: 'com.meizu.statsapp', name: 'MzUsageStats', version: '3.2.5', ext: 'aar')
     compile 'org.projectlombok:lombok:1.16.6'
-// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
-// https://mvnrepository.com/artifact/com.alibaba/fastjson
-    compile group: 'com.alibaba', name: 'fastjson', version: '1.2.62'
-    compile(group: 'com.meizu.flyme.sdk', name: 'meizu-common', version: '4.0.11', ext: 'aar')
-
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    compile 'org.apache.commons:commons-lang3:3.1'
+    // https://mvnrepository.com/artifact/com.alibaba/fastjson
+    compile 'com.alibaba:fastjson:1.2.62'
+    //    compile(group: 'com.meizu.flyme.sdk', name: 'meizu-common', version: '4.0.11', ext: 'aar')
 }
 
 

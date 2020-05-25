@@ -1,6 +1,7 @@
 package com.meizu.lastmile.requestObj;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * @Author: huangyongwen
@@ -8,6 +9,7 @@ import lombok.Data;
  * @CreateDate:
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class PingRequestObject extends Instruction {
 
     /**

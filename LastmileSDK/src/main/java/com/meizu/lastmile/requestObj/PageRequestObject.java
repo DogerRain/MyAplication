@@ -1,6 +1,7 @@
 package com.meizu.lastmile.requestObj;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * @Author: huangyongwen
@@ -8,5 +9,6 @@ import lombok.Data;
  * @Description:
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class PageRequestObject extends Instruction {
 }

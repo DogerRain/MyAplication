@@ -11,11 +11,7 @@ import lombok.ToString;
  * @CreateDate: 2020/5/21 11:00
  * @Description:
  */
-@Builder
 @Data
-@ToString(callSuper = true)
-@RequiredArgsConstructor
-@AllArgsConstructor
 /**
  * 附带ping操作
  */
