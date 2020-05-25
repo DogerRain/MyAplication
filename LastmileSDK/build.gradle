@@ -71,6 +71,6 @@ task makeJar(type:Copy) {
 //include,exclude参数来设置过滤
     include("classes.jar")
 //重命名为test.jar
-    rename("classes.jar","lastmileSDK-1.0.jar")
+    rename("lastmileSDK-release-1.0.jar","lastmileSDK-1.0.jar")
 }
 makeJar.dependsOn(build)

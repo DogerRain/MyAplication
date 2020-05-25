@@ -1,6 +1,7 @@
 package com.meizu.lastmile.service;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.meizu.lastmile.Utils.CommonUtils;
 
@@ -12,18 +13,25 @@ import com.meizu.lastmile.Utils.CommonUtils;
 
 public class TaskTriggerService extends Thread {
 
+    private String TAG = "LastMileSDK》》》 TaskTriggerService";
 
-    public void startTask(Context context) {
+    private Context context;
+
+    public TaskTriggerService(Context context) {
+        this.context = context;
+    }
+
+    public void startTask() {
         int flag = CommonUtils.getNetWorkStart(context);
 
         switch (flag) {
             case CommonUtils.NETWORW_WIFI:
-                startPingTask(context);
-                startSingleWebTask(context);
-                startFileDownloadTask(context);
+                startPingTask();
+                startSingleWebTask();
+                startFileDownloadTask();
                 break;
             case CommonUtils.NETWORK_MOBILE:
-                startPingTask(context);
+                startPingTask();
                 break;
             default:
                 break;
@@ -34,23 +42,25 @@ public class TaskTriggerService extends Thread {
     /**
      * 启动ping任务
      */
-    private void startPingTask(Context context) {
-
+    private void startPingTask() {
+        Log.i(TAG, "启动ping任务呀");
+        PingRunLocalTaskService pingRunLocalTaskService = new PingRunLocalTaskService(context);
+        pingRunLocalTaskService.start();
     }
 
 
     /**
-     * 启动curl任务
+     * 启动网页任务
      */
-    private void startSingleWebTask(Context context) {
-
+    private void startSingleWebTask() {
+        Log.i(TAG, "启动网页任务");
     }
 
     /**
-     * 启动curl任务
+     * 启动文件下载任务
      */
-    private void startFileDownloadTask(Context context) {
-
+    private void startFileDownloadTask() {
+        Log.i(TAG, "启动文件下载任务");
     }
 
 }

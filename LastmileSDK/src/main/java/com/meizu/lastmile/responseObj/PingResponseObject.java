@@ -1,6 +1,5 @@
 package com.meizu.lastmile.responseObj;
 
-import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -9,7 +8,6 @@ import lombok.Data;
  * @CreateDate:
  */
 @Data
-@Builder
 public class PingResponseObject {
     /**
      * 平均延时
@@ -25,5 +23,17 @@ public class PingResponseObject {
      * 发送耗时
      */
     String sendUsedTime;
+
+
+
+    /**
+     * 发送包，接收包，丢失率
+     */
+    String transmittedPackages;
+    String receivedPackages;
     String packetLossRate;
+
+    Boolean result;
+    StringBuffer resultBuffer;
+
 }

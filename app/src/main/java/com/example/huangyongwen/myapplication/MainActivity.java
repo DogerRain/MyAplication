@@ -9,9 +9,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.huangyongwen.myapplication.permission.PermissionsChecker;
-import com.example.huangyongwen.myapplication.service.PingService.PingNet;
 import com.example.huangyongwen.myapplication.utils.CommonUtil;
-import com.meizu.lastmile.service.PingService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -91,11 +89,11 @@ public class MainActivity extends Activity {
         button3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String userid = CommonUtil.getSettingNote(MainActivity.this, "userinfo", "userid");
+        /*        String userid = CommonUtil.getSettingNote(MainActivity.this, "userinfo", "userid");
                 String userpwd = CommonUtil.getSettingNote(MainActivity.this, "userinfo", "userpwd");
                 Log.d("userid:", "userId:" + userid);
                 Log.d("userpwd:", "userpwd:" + userpwd);
-                textView2.setText(userid + "|" + userpwd);
+                textView2.setText(userid + "|" + userpwd);*/
 /*
                 OkHttpClient.Builder builder = GslbOkClientBuilderFactory.newBuilder(new GslbManager(MainActivity.this));
 //在这里，你可以继续通过builder设置你的client
@@ -120,7 +118,7 @@ public class MainActivity extends Activity {
         button4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new PingNet().getPingResult();
+//                new PingNet().getPingResult();
                 Log.i(TAG,"按道理进入方法了");
                 Intent intent = new Intent();
                 //setClass函数的第一个参数是一个Context对象
@@ -128,7 +126,7 @@ public class MainActivity extends Activity {
                 //setClass函数的第二个参数是一个Class对象，在当前场景下，应该传入需要被启动的Activity类的class对象
                 intent.setClass(MainActivity.this, Main2Activity.class);
                 startActivity(intent);
-                new PingService().receiveInstructionAndStorage(null,MainActivity.this);
+//                new PingService().receiveInstructionAndStorage(null,MainActivity.this);
             }
         });
 

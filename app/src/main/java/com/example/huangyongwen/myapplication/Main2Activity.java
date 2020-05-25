@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.example.huangyongwen.myapplication.utils.DatabaseHelper;
+import com.meizu.lastmile.LastmileClient;
 
 public class Main2Activity extends Activity implements View.OnClickListener {
 
@@ -21,6 +22,8 @@ public class Main2Activity extends Activity implements View.OnClickListener {
     Button update = null;
     Button query = null;
     Button delete = null;
+    Button receiveTask = null;
+    Button runTask = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +41,14 @@ public class Main2Activity extends Activity implements View.OnClickListener {
         update = (Button) this.findViewById(R.id.update);
         query = (Button) this.findViewById(R.id.query);
         delete = (Button) this.findViewById(R.id.delete);
+
+
+
+        //增加两个 接收任务 和 跑 任务
+        receiveTask = (Button) this.findViewById(R.id.receiveTask);
+        runTask = (Button) this.findViewById(R.id.runTask);
+
+
         //添加监听器
         createDatabase.setOnClickListener(this);
         updateDatabase.setOnClickListener(this);
@@ -45,12 +56,17 @@ public class Main2Activity extends Activity implements View.OnClickListener {
         update.setOnClickListener(this);
         query.setOnClickListener(this);
         delete.setOnClickListener(this);
+        receiveTask.setOnClickListener(this);
+        runTask.setOnClickListener(this);
+
+
     }
 
     @Override
     public void onClick(View v) {
 // 判断所触发的被监听控件，并执行命令
         Log.i("Tag:","监控点击事件");
+        LastmileClient lastmileClient = new LastmileClient(Main2Activity.this);
         switch (v.getId()) {
             //创建数据库
             case R.id.createDatabase:
@@ -58,7 +74,8 @@ public class Main2Activity extends Activity implements View.OnClickListener {
                 //创建一个DatabaseHelper对象
                 DatabaseHelper dbHelper1 = new DatabaseHelper(Main2Activity.this, "test_db");
                 //取得一个只读的数据库对象
-                SQLiteDatabase db1 = dbHelper1.getReadableDatabase();
+                SQLiteDatabase db1 = dbHelper1.getWritableDatabase();
+                db1.execSQL("create table user(id int,name varchar(20))");
                 break;
             //更新数据库
             case R.id.updateDatabase:
@@ -104,8 +121,49 @@ public class Main2Activity extends Activity implements View.OnClickListener {
                 SQLiteDatabase db6 = dbHelper6.getWritableDatabase();
                 db6.delete("user", "id=?", new String[]{"1"});
                 break;
+
+            case R.id.receiveTask:
+
+                Log.i(SWORD, "接收任务》》》》》》");
+                String jsonString ="{\n" +
+                        "\t\"taskId\": 1234566, \n" +
+                        "  \"taskType\": \"ping\",\n" +
+                        "\t\"groups\": [\n" +
+                        "\t\t{\n" +
+                        "\t\t\t\"idc\": \"ns\",\n" +
+                        "\t\t\t\"isp\": [\"telecom\", \"unicom\"],\n" +
+                        "\t\t\t\" cities\": [\n" +
+                        "\t\t\t\t\"zhuhai\",\n" +
+                        "\t\t\t\t\"guangzho\"\n" +
+                        "\t\t\t]\n" +
+                        "\t\t},\n" +
+                        "\t\t{\n" +
+                        "\t\t\t\"idc\": \"bj\",\n" +
+                        "\t\t\t\"isp\": [\"mobile\"],\n" +
+                        "\t\t\t\" cities\": [\n" +
+                        "\t\t\t\t\"beijing\",\n" +
+                        "\t\t\t\t\"tianjin\"\n" +
+                        "\t\t\t]\n" +
+                        "\t\t}\n" +
+                        "  ],\n" +
+                        "        \n" +
+                        "  \"host\": \" 10.131.0.242\",\n" +
+                        "  \"timeout\": 10,\n" +
+                        "    \"size\": 32,\n" +
+                        "    \"count\": 4,\n" +
+                        "    \"tcpPing\": false,\n" +
+                        "    \"interval\": 0.2,\n" +
+                        "    \"supportIPv6\": 2,\n" +
+                        "    \"dnsMatch\": 0\n" +
+                        "}";
+                lastmileClient.reviceInstructions(jsonString);
+                break;
+            case R.id.runTask:
+                Log.i(SWORD, "执行本地任务》》》》》》");
+                lastmileClient.startLocalTask();
             default:
                 Log.i(SWORD, "error");
+
                 break;
         }
     }

@@ -16,38 +16,43 @@ import com.meizu.lastmile.service.TaskTriggerService;
 public class LastmileClient implements Lastmile {
     Context context;
 
-    LastmileClient(Context context) {
+    public LastmileClient(Context context) {
         this.context = context;
     }
 
+
     @Override
     public void reviceInstructions(String jsonString) {
+        //起一个线程
+        PingService pingService = new PingService(jsonString, context);
         Instruction instruction = JSON.parseObject(jsonString, Instruction.class);
         String taskType = instruction.getTaskType();
         switch (taskType) {
             case ConstantUtils.PING:
-                new PingService().receiveInstructionAndStorage(jsonString, context);
+                pingService.start();
                 break;
             case ConstantUtils.PAGE:
-                new PingService().receiveInstructionAndStorage(jsonString, context);
+                pingService.start();
                 break;
             case ConstantUtils.DOWNLOAD:
-                new PingService().receiveInstructionAndStorage(jsonString, context);
+                pingService.start();
                 break;
             default:
                 break;
         }
-
     }
 
     @Override
-    public void getLastestTask(String content) {
+    public void getLastestTask() {
 
     }
 
 
-    public void startTask(Context context) {
-        new TaskTriggerService().startTask(context);
+
+    @Override
+    public void startLocalTask() {
+        TaskTriggerService taskTriggerService = new TaskTriggerService(context);
+        taskTriggerService.startTask();
     }
 
 

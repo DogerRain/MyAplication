@@ -37,7 +37,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //创建数据库sql语句
         String sql = "create table user(id int,name varchar(20))";
         //执行创建数据库操作
-        db.execSQL(sql);
+//        db.execSQL(sql);
     }
 
     @Override

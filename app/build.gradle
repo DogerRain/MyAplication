@@ -61,6 +61,7 @@ dependencies {
 //    dependencies {
 //        compile(name:'app-release', ext:'aar')
 //    }
-        compile(name: 'LastmileSDK-release', ext: 'aar')
+//        compile(name: 'LastmileSDK-release', ext: 'aar')
+    compile project(path: ':LastmileSDK')
 }
 

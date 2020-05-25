@@ -24,7 +24,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int VERSION = 1;
     private static final String SWORD = "SWORD";
 
-    private static final String databaseName = "lastmile";
+    private static final String databaseName = "lastmile_db";
+//    private String tableNameInit = "";
 
 
     private SQLiteDatabase sqLiteDatabase = null;
@@ -46,6 +47,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     //带两个参数的构造函数，调用的其实是带三个参数的构造函数
+    public DatabaseHelper(Context context, String tableNameInit) {
+        this(context, databaseName, VERSION);
+//        this.tableNameInit = tableNameInit;
+    }
+
     public DatabaseHelper(Context context) {
         this(context, databaseName, VERSION);
     }
@@ -61,7 +67,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         Log.i(SWORD, "create a Database");
         //创建数据库sql语句
-//        String sql = "create table user(id int,name varchar(20))";
+//        String sql = tableNameInit;
         //执行创建数据库操作
 //        db.execSQL(sql);
     }
@@ -73,12 +79,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-    public boolean IsTableExist(SQLiteDatabase db, String tableName) {
+    public boolean isTableExist(SQLiteDatabase db, String tableName) {
         String sql = "SELECT count(*) FROM sqlite_master  WHERE type='table' AND name=?";
         Cursor cursor = db.rawQuery(sql, new String[]{tableName});
         while (cursor.moveToNext()) {
+            int result = cursor.getInt(0);
             //遍历出表名
-            if (cursor.getString(0) != null) { //不为空证明表存在
+            if (result != 0) { // 0表示不存在
                 return true;
             }
         }

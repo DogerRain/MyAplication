@@ -15,7 +15,7 @@ public interface Lastmile {
      *
      * @param content
      */
-    public void getLastestTask(String content);
+    public void getLastestTask();
 
-    public void startTask(Context context);
+    public void startLocalTask();
 }

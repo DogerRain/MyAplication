@@ -42,6 +42,20 @@
         android:layout_height="wrap_content"
         android:text="delete" />
 
+
+    <Button
+        android:id="@+id/receiveTask"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="receiveTask" />
+
+
+    <Button
+        android:id="@+id/runTask"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="runTask" />
+
     <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"

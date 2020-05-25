@@ -61,8 +61,8 @@ public class Instruction {
     /**
      * 有效期
      */
-    String validTimeStart;
-    String validTimeEnd;
+    String expireFrom;
+    String expireTo;
 
 
 }
