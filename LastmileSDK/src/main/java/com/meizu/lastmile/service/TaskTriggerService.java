@@ -11,7 +11,7 @@ import com.meizu.lastmile.Utils.CommonUtils;
  * @Description: 任务触发service
  */
 
-public class TaskTriggerService extends Thread {
+public class TaskTriggerService {
 
     private String TAG = "LastMileSDK》》》 TaskTriggerService";
 

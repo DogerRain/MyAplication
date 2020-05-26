@@ -51,8 +51,10 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
 //                String s = textView2.getText().toString();
-                Boolean flag = new PermissionsChecker(MainActivity.this).checkPermission(MainActivity.this);
-                if (!flag) {
+//                Boolean flag = new PermissionsChecker(MainActivity.this).checkPermission(MainActivity.this);
+                Boolean isLackPerssion = new com.meizu.lastmile.Utils.PermissionsChecker(MainActivity.this).checkLackWritePermission();
+
+                if (!isLackPerssion) {
                     //表示有权限
                     Log.d(TAG, "有权限: ");
 
@@ -118,8 +120,8 @@ public class MainActivity extends Activity {
         button4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                new PingNet().getPingResult();
-                Log.i(TAG,"按道理进入方法了");
+//                new PingNet().start();
+                Log.i(TAG, "按道理进入方法了");
                 Intent intent = new Intent();
                 //setClass函数的第一个参数是一个Context对象
                 //Context是一个类，Activity是Context类的子类，也就是说，所有的Activity对象，都可以向上转型为Context对象

@@ -6,7 +6,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
-import com.meizu.lastmile.Utils.CommonUtils;
 import com.meizu.lastmile.Utils.ConstantUtils;
 import com.meizu.lastmile.Utils.DatabaseHelper;
 import com.meizu.lastmile.requestObj.PingRequestObject;
@@ -42,6 +41,12 @@ public class PingService extends Thread {
     }
 
     public void receiveInstructionAndStorage() {
+
+     /*   Boolean isLackPerssion = new PermissionsChecker(context).checkLackWritePermission();
+        if (isLackPerssion) {
+            Log.i(TAG,"没有读写文件的权限");
+            return;
+        }*/
 
         if (StringUtils.isBlank(pingJsonString)) {
             return;
@@ -87,7 +92,7 @@ public class PingService extends Thread {
 
                 "executeTimeStart varchar(30)," +
                 "executeTimeEnd varchar(30)," +
-                "IsExecute varchar(5)," +
+                "isExecute varchar(5)," +
                 "status int NOT NULL default 1" +
                 ")";
 
@@ -97,7 +102,7 @@ public class PingService extends Thread {
 
         String target = pingRequestObject.getHost() != null ? pingRequestObject.getHost() : pingRequestObject.getHostName();
         StringBuffer command = new StringBuffer();
-        command.append("ping " + target);
+        command.append("ping");
         //ping次数
         command.append(" -c " + pingRequestObject.getCount());
         //windows是 -l ；Linux是 -s
@@ -106,6 +111,8 @@ public class PingService extends Thread {
         command.append(" -w " + pingRequestObject.getTimeout());
         //发送数据包的间隔， 单位是秒
         command.append(" -i " + pingRequestObject.getInterval());
+        //目标
+        command.append(" " + target);
 
         //1. 获取本地数据库
         DatabaseHelper dbHelper1 = new DatabaseHelper(context);
@@ -134,12 +141,12 @@ public class PingService extends Thread {
             values.put("monitorFrequency", pingRequestObject.getMonitorFrequency());
             values.put("executeTimeStart", pingRequestObject.getExecuteTimeStart());
             values.put("executeTimeEnd", pingRequestObject.getExecuteTimeEnd());
-            values.put("IsExecute", pingRequestObject.getIsExecute());
+            values.put("isExecute", pingRequestObject.getIsExecute());
 
 
             //2. 获取表是否存在，不存在则创建
             if (!dbHelper1.isTableExist(db1, ConstantUtils.T_PING)) {
-                Log.i(TAG, "创建表。。。。。");
+                Log.i(TAG, "创建表》》》》》》");
                 dbHelper1.createTable(db1, tableStructure);
             }
 
@@ -150,10 +157,12 @@ public class PingService extends Thread {
             Boolean IsHasTaskId = dbHelper1.queryTaskIdSQL(db1, ConstantUtils.T_PING, new String[]{"taskId"}, selection, placeholderValues);
             if (IsHasTaskId) {
                 //已经存在任务，更新任务
+                Log.i(TAG, "任务已存在，更新任务》》》》》");
                 String[] condition = new String[]{taskId};
                 dbHelper1.update(db1, ConstantUtils.T_PING, values, condition);
             } else {
                 //不存在任务，插入任务
+                Log.i(TAG, "任务不存在，插入任务》》》》》");
                 dbHelper1.insert(db1, ConstantUtils.T_PING, values);
             }
 

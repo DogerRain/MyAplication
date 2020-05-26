@@ -66,7 +66,7 @@ public class Main2Activity extends Activity implements View.OnClickListener {
     public void onClick(View v) {
 // 判断所触发的被监听控件，并执行命令
         Log.i("Tag:","监控点击事件");
-        LastmileClient lastmileClient = new LastmileClient(Main2Activity.this);
+
         switch (v.getId()) {
             //创建数据库
             case R.id.createDatabase:
@@ -125,14 +125,15 @@ public class Main2Activity extends Activity implements View.OnClickListener {
             case R.id.receiveTask:
 
                 Log.i(SWORD, "接收任务》》》》》》");
-                String jsonString ="{\n" +
+                String jsonString ="\n" +
+                        "{\n" +
                         "\t\"taskId\": 1234566, \n" +
                         "  \"taskType\": \"ping\",\n" +
                         "\t\"groups\": [\n" +
                         "\t\t{\n" +
                         "\t\t\t\"idc\": \"ns\",\n" +
                         "\t\t\t\"isp\": [\"telecom\", \"unicom\"],\n" +
-                        "\t\t\t\" cities\": [\n" +
+                        "\t\t\t\"cities\": [\n" +
                         "\t\t\t\t\"zhuhai\",\n" +
                         "\t\t\t\t\"guangzho\"\n" +
                         "\t\t\t]\n" +
@@ -140,14 +141,14 @@ public class Main2Activity extends Activity implements View.OnClickListener {
                         "\t\t{\n" +
                         "\t\t\t\"idc\": \"bj\",\n" +
                         "\t\t\t\"isp\": [\"mobile\"],\n" +
-                        "\t\t\t\" cities\": [\n" +
+                        "\t\t\t\"cities\": [\n" +
                         "\t\t\t\t\"beijing\",\n" +
                         "\t\t\t\t\"tianjin\"\n" +
                         "\t\t\t]\n" +
                         "\t\t}\n" +
                         "  ],\n" +
                         "        \n" +
-                        "  \"host\": \" 10.131.0.242\",\n" +
+                        "  \"host\": \"14.152.74.1\",\n" +
                         "  \"timeout\": 10,\n" +
                         "    \"size\": 32,\n" +
                         "    \"count\": 4,\n" +
@@ -156,14 +157,14 @@ public class Main2Activity extends Activity implements View.OnClickListener {
                         "    \"supportIPv6\": 2,\n" +
                         "    \"dnsMatch\": 0\n" +
                         "}";
-                lastmileClient.reviceInstructions(jsonString);
+                new LastmileClient(Main2Activity.this).reviceInstructions(jsonString,null);
                 break;
             case R.id.runTask:
                 Log.i(SWORD, "执行本地任务》》》》》》");
-                lastmileClient.startLocalTask();
+               new LastmileClient(Main2Activity.this).startLocalTask();
+                break;
             default:
                 Log.i(SWORD, "error");
-
                 break;
         }
     }

@@ -12,14 +12,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class PingNet {
+public class PingNet extends Thread{
     private static final String TAG = "PingNet";
 
-
-    public void getPingResult(){
+    @Override
+    public void run() {
         PingNetEntity pingNetEntity=new PingNetEntity("www.baidu.com",3,5,new StringBuffer());
         pingNetEntity=PingNet.ping(pingNetEntity);
-
 //        Log.i("testPing",pingNetEntity.getIp());
 //        Log.i("testPing","time="+pingNetEntity.getPingTime());
 //        Log.i("testPing",pingNetEntity.isResult()+"");
@@ -34,9 +33,10 @@ public class PingNet {
         String line = null;
         Process process = null;
         BufferedReader successReader = null;
-//        String command = "ping -c " + pingNetEntity.getPingCount() + " -w " + pingNetEntity.getPingWtime() + " " + pingNetEntity.getIp();
-        String command = " curl -o /dev/null -s -w time_namelookup:\"\\t\"%{time_namelookup}\"\\n\"time_connect:\"\\t\\t\"%{time_connect}\"\\n\"time_appconnect:\"\\t\"%{time_appconnect}\"\\n\"time_pretransfer:\"\\t\"%{time_pretransfer}\"\\n\"time_starttransfer:\"\\t\"%{time_starttransfer}\"\\n\"time_total:\"\\t\\t\"%{time_total}\"\\n\"time_redirect:\"\\t\\t\"%{time_redirect}\"\\n\" https://rain.baimuxym.cn/";
+        String command = "ping -c " + pingNetEntity.getPingCount() + " -w " + pingNetEntity.getPingWtime() + " " + pingNetEntity.getIp();
+//        String command = " curl -o /dev/null -s -w time_namelookup:\"\\t\"%{time_namelookup}\"\\n\"time_connect:\"\\t\\t\"%{time_connect}\"\\n\"time_appconnect:\"\\t\"%{time_appconnect}\"\\n\"time_pretransfer:\"\\t\"%{time_pretransfer}\"\\n\"time_starttransfer:\"\\t\"%{time_starttransfer}\"\\n\"time_total:\"\\t\\t\"%{time_total}\"\\n\"time_redirect:\"\\t\\t\"%{time_redirect}\"\\n\" https://rain.baimuxym.cn/";
 //        String command = "ping -c " + pingCount + " " + host;
+        System.out.println(command);
         try {
             process = Runtime.getRuntime().exec(command);
             if (process == null) {

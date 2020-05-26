@@ -2,10 +2,7 @@ package com.meizu.lastmile.requestObj;
 
 import java.util.List;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * @Author: huangyongwen
@@ -44,15 +41,13 @@ public class Instruction {
      * 监测计划，设置监测频率的同时亦可设定监测计划，
      * 如：周六-周⼀00:00:00 – 20:00:00 不执⾏/执行
      */
-
     String executeTimeStart;
-
     String executeTimeEnd;
-
     /**
      * 是否在执行计划执行，true表示仅在执行计划执行，false表示 在执行计划 外执行
      */
-    Boolean IsExecute;
+    Boolean isExecute;
+
 
 
     /**

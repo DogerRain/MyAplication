@@ -1,7 +1,6 @@
 package com.example.huangyongwen.myapplication.permission;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.pm.PackageManager;
 
 import androidx.core.app.ActivityCompat;
@@ -14,7 +13,7 @@ import androidx.core.content.ContextCompat;
  */
 
 public class PermissionsChecker {
-    private final Context mContext;
+    private Activity activity;
     private final int RESULT_CODE_LOCATION = 100;
 
     //读写文件的权限
@@ -22,8 +21,8 @@ public class PermissionsChecker {
             "android.permission.READ_EXTERNAL_STORAGE"
             , "android.permission.WRITE_EXTERNAL_STORAGE"};
 
-    public PermissionsChecker(Context context) {
-        mContext = context.getApplicationContext();
+    public PermissionsChecker(Activity activity) {
+      this.activity=activity;
     }
 
     // 判断权限集合
@@ -38,11 +37,11 @@ public class PermissionsChecker {
 
     // 判断是否缺少权限
     private boolean lacksPermission(String permission) {
-        return ContextCompat.checkSelfPermission(mContext, permission) ==
+        return ContextCompat.checkSelfPermission(activity, permission) ==
                 PackageManager.PERMISSION_DENIED;
     }
 
-    public Boolean checkPermission(Activity activity) {
+    public Boolean checkPermission() {
         //true表示缺少该权限
         if (lacksPermissions(permsLocation)) {
             //是否弹出询问用户的弹窗

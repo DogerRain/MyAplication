@@ -27,12 +27,12 @@ import java.util.Map;
  * @Description: 执行本地任务
  */
 
-public class PingRunLocalTaskService extends Thread {
+public class PageRunLocalTaskService extends Thread {
     private String TAG = "LastMileSDK》》》 PingRunLocalTaskService";
 
     private Context context;
 
-    public PingRunLocalTaskService(Context context) {
+    public PageRunLocalTaskService(Context context) {
         this.context = context;
     }
 

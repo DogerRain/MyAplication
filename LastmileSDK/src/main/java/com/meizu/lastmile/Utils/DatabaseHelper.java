@@ -139,6 +139,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 //    }
 
 
+    /**
+     *
+     * @param db
+     * @param tableName
+     * @param selectColumnName
+     * @param slection
+     * @param condition
+     * @return 通过taskId查询任务
+     */
     public Boolean queryTaskIdSQL(SQLiteDatabase db, String tableName, String[] selectColumnName, String slection, String[] condition) {
 //        Cursor cursor = db.rawQuery(sql, selectionArgs);
         Cursor cursor = db.query(tableName, selectColumnName, slection, condition, null, null, null, "1");
@@ -171,7 +180,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         while (cursor.moveToNext()) {
             Map<String, String> hashMap = new HashMap<>();
             for (String s : selectColumnName) {
-                String value = cursor.getString(cursor.getColumnIndex(s)) + "";
+                String value = cursor.getString(cursor.getColumnIndex(s));
+                if (null != value && (value.equals("null") || value.equals(""))) {
+                    value = null;
+                }
                 hashMap.put(s, value);
             }
             list.add(hashMap);
