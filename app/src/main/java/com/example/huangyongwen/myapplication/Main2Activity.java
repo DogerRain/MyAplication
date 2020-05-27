@@ -163,6 +163,53 @@ public class Main2Activity extends Activity implements View.OnClickListener {
                 Log.i(SWORD, "执行本地任务》》》》》》");
                new LastmileClient(Main2Activity.this).startLocalTask();
                 break;
+
+
+
+            case  R.id.receivePageTask:
+                String jsonPageString ="{\n" +
+                        "    \"taskId\":1234567,\n" +
+                        "    \"taskType\":\"page\",\n" +
+                        "    \"groups\":[\n" +
+                        "        {\n" +
+                        "            \"idc\":\"ns\",\n" +
+                        "            \"isp\":[\n" +
+                        "                \"telecom\",\n" +
+                        "                \"unicom\"\n" +
+                        "            ],\n" +
+                        "            \"cities\":[\n" +
+                        "                \"zhuhai\",\n" +
+                        "                \"guangzho\"\n" +
+                        "            ]\n" +
+                        "        },\n" +
+                        "        {\n" +
+                        "            \"idc\":\"bj\",\n" +
+                        "            \"isp\":[\n" +
+                        "                \"mobile\"\n" +
+                        "            ],\n" +
+                        "            \"cities\":[\n" +
+                        "                \"beijing\",\n" +
+                        "                \"tianjin\"\n" +
+                        "            ]\n" +
+                        "        }\n" +
+                        "    ],\n" +
+                        "    \"url\":\"https://fms.res.meizu.com/dms/2020/05/08/041087f7-680e-40fe-a2cc-bcdb81931aa3.png\",\n" +
+                        "    \"timeout\":120,\n" +
+                        "    \"useRedirect\":true,\n" +
+                        "    \"httpHeaders\":[\n" +
+                        "        \"User-Agent:mz-lastmile\"\n" +
+                        "    ],\n" +
+                        "    \"hijacking\":false,\n" +
+                        "    \"expectContaining\":null,\n" +
+                        "    \"expireFrom\":\"2019-12-20 00:00:00\",\n" +
+                        "    \"expireTo\":\"2020-12-20 23:59:59\"\n" +
+                        "}";
+                new LastmileClient(Main2Activity.this).reviceInstructions(jsonPageString,null);
+                break;
+
+            case R.id.runPageTask:
+
+
             default:
                 Log.i(SWORD, "error");
                 break;

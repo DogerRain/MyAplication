@@ -1,5 +1,7 @@
 package com.meizu.lastmile.requestObj;
 
+import java.util.List;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -17,22 +19,42 @@ public class PageRequestObject extends Instruction {
     String url;
 
     /**
-     * 超时时间
+     * 连接 超时时间
      */
-    int timeout = 5;
-
-    int redirects;
-
-    String httpHeaders;
-
-    Boolean hijacking =false;
+    int connectTimeout = 5;
+    /**
+     * 最大超时时间 假如一个文件 超过 MaxTimeout 还没下载完，就会返回
+     */
+    int maxTimeout = 10;
 
     /**
-     * // 页面源代码中未找到如下预期正确文本内容时触发“预期的页面内容未找到”错误
+     * 是否使用重定向
+     */
+    int useRedirect = 1;
+
+    /**
+     * 表头 可以有多个
+     */
+    List<String> httpHeaders;
+
+    Boolean hijacking = false;
+
+    /**
+     * 页面源代码中未找到如下预期正确文本内容时触发“预期的页面内容未找到”错误
      */
 
     String expectContaining;
 
 
 
+    /**
+     * 上一次执行时间
+     */
+    String lastExecuteTime;
+
+
+    /**
+     * 监测频率,单位小时
+     */
+    String monitorFrequency;
 }

@@ -56,6 +56,20 @@
         android:layout_height="wrap_content"
         android:text="runTask" />
 
+    <Button
+        android:id="@+id/receivePageTask"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="receivePageTask" />
+
+
+    <Button
+        android:id="@+id/runPageTask"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="runPageTask" />
+
+
     <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"

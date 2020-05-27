@@ -27,18 +27,19 @@ public class ReceiveTaskService {
 
     public void receiveInstructions() {
         //起一个线程
-        PingService pingService = new PingService(jsonString, context);
         Instruction instruction = JSON.parseObject(jsonString, Instruction.class);
         String taskType = instruction.getTaskType();
         switch (taskType) {
             case ConstantUtils.PING:
+                PingService pingService = new PingService(jsonString, context);
                 pingService.start();
                 break;
             case ConstantUtils.PAGE:
-                pingService.start();
+                PageService pageService = new PageService(jsonString,context);
+                pageService.start();
                 break;
             case ConstantUtils.DOWNLOAD:
-                pingService.start();
+
                 break;
             default:
                 break;
