@@ -27,12 +27,10 @@ public class PageAndDownloadService extends Thread {
 
     private Context context;
     private String jsonString;
-    private Options options;
 
-    public PageAndDownloadService(String jsonString, Context context, Options options) {
+    public PageAndDownloadService(String jsonString, Context context ) {
         this.context = context;
         this.jsonString = jsonString;
-        this.options = options;
     }
 
     @Override

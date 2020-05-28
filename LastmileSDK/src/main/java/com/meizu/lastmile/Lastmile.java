@@ -11,7 +11,7 @@ import com.meizu.lastmile.requestObj.Options;
 public interface Lastmile {
 
 
-    public void reviceInstructions(String jsonString, Options options);
+    public void reviceInstructions(String jsonString);
 
     /**
      * 参数待定
@@ -20,5 +20,5 @@ public interface Lastmile {
      */
     public void getLastestTask();
 
-    public void startLocalTask();
+    public void startLocalTask(Options options);
 }

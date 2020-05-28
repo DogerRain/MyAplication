@@ -19,8 +19,8 @@ public class LastmileClient implements Lastmile {
     }
 
     @Override
-    public void reviceInstructions(String jsonString, Options options) {
-        new ReceiveTaskService(context, jsonString, options).receiveInstructions();
+    public void reviceInstructions(String jsonString) {
+        new ReceiveTaskService(context, jsonString).receiveInstructions();
     }
 
     @Override
@@ -30,9 +30,9 @@ public class LastmileClient implements Lastmile {
 
 
     @Override
-    public void startLocalTask() {
+    public void startLocalTask(Options options) {
         TaskTriggerService taskTriggerService = new TaskTriggerService(context);
-        taskTriggerService.startTask();
+        taskTriggerService.startTask(options);
     }
 
 

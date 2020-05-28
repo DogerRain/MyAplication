@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.meizu.lastmile.Utils.CommonUtils;
 import com.meizu.lastmile.Utils.ConstantUtils;
 import com.meizu.lastmile.Utils.DatabaseHelper;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +68,8 @@ public class ExcuseLocalTaskService extends Thread {
             return;
         }
         //4.查询本地任务，把命令取出
-        String[] selectColumnName = new String[]{"taskId", "taskType", "command", "lastExecuteTime", "expireFrom", "expireTo", "groups", "monitorFrequency", "executeTimeStart", "executeTimeEnd", "isExecute"};
+        String[] selectColumnName = new String[]{"taskId", "taskType", "command", "lastExecuteTime", "expireFrom",
+                "expireTo", "groups", "monitorFrequency", "executeTimeStart", "executeTimeEnd", "isExecute"};
         String slection = "taskType=?";
         String[] condition = new String[]{taskType};
         List<Map<String, String>> list = dbHelper.queryTask(db, tableName, selectColumnName, slection, condition);
@@ -122,19 +125,35 @@ public class ExcuseLocalTaskService extends Thread {
                     }
                 }
 
-                //取group
-                Group group = JSON.parseObject(hashmap.get("group"), Group.class);
-                //取command命令
-                String commad = hashmap.get("command") + "";
-
-                switch (taskType){
-
+                //options 与 group节点匹配
+                String groups = hashmap.get("group");
+                if (StringUtils.isNotBlank(groups)) {
+                    ArrayList<Group> groupArrayList = JSON.parseObject(groups, new TypeReference<ArrayList<Group>>() {
+                    });
+                    for (Group group : groupArrayList){
+                        
+                    }
                 }
 
-//                System.out.println(pingResponseObject);
-                //上传到大数据那边
 
-
+                //取command命令
+                String commad = hashmap.get("command") + "";
+                PingResponseObject pingResponseObject = new PingResponseObject();
+                PageResponseObject pageResponseObject = new PageResponseObject();
+                PageResponseObject downloadresponseObject = new PageResponseObject();
+                switch (taskType) {
+                    case ConstantUtils.PING:
+                        pingResponseObject = analysePingCommand(commad);
+                        break;
+                    case ConstantUtils.PAGE:
+                        pageResponseObject = analyseCurlCommand(commad);
+                        break;
+                    case ConstantUtils.DOWNLOAD:
+                        downloadresponseObject = analyseCurlCommand(commad);
+                        break;
+                    default:
+                        break;
+                }
 
 //                执行完成，更新上一次执行时间
                 String startString = CommonUtils.YYYY_MM_ddd_HH_mm_ss.format(start);
@@ -236,7 +255,6 @@ public class ExcuseLocalTaskService extends Thread {
                 pageResponseObject.setResult(false);
                 return pageResponseObject;
             }
-
             successReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             while ((line = successReader.readLine()) != null) {
                 //规则解析
@@ -378,5 +396,23 @@ public class ExcuseLocalTaskService extends Thread {
             return null;
         }
         return new BigDecimal(value.trim()).multiply(bigDecimal).setScale(0);
+    }
+
+    public static void main(String[] args) {
+        String josnString = "[{\n" +
+                "\t\"groupCount\": 0,\n" +
+                "\t\"idc\": \"ns\",\n" +
+                "\t\"isp\": [\"telecom\", \"unicom\"]\n" +
+                "}, {\n" +
+                "\t\"groupCount\": 0,\n" +
+                "\t\"idc\": \"bj\",\n" +
+                "\t\"isp\": [\"mobile\"]\n" +
+                "}]";
+        ArrayList<Group> groupArrayList = JSON.parseObject(josnString, new TypeReference<ArrayList<Group>>() {
+        });
+        for (Group group : groupArrayList) {
+            System.out.println(group);
+        }
+
     }
 }

@@ -43,7 +43,6 @@ public class Main2Activity extends Activity implements View.OnClickListener {
         delete = (Button) this.findViewById(R.id.delete);
 
 
-
         //增加两个 接收任务 和 跑 任务
         receiveTask = (Button) this.findViewById(R.id.receiveTask);
         runTask = (Button) this.findViewById(R.id.runTask);
@@ -65,12 +64,12 @@ public class Main2Activity extends Activity implements View.OnClickListener {
     @Override
     public void onClick(View v) {
 // 判断所触发的被监听控件，并执行命令
-        Log.i("Tag:","监控点击事件");
+        Log.i("Tag:", "监控点击事件");
 
         switch (v.getId()) {
             //创建数据库
             case R.id.createDatabase:
-                Log.i("Tag:","创建数据库");
+                Log.i("Tag:", "创建数据库");
                 //创建一个DatabaseHelper对象
                 DatabaseHelper dbHelper1 = new DatabaseHelper(Main2Activity.this, "test_db");
                 //取得一个只读的数据库对象
@@ -125,7 +124,7 @@ public class Main2Activity extends Activity implements View.OnClickListener {
             case R.id.receiveTask:
 
                 Log.i(SWORD, "接收任务》》》》》》");
-                String jsonString ="\n" +
+                String jsonString = "\n" +
                         "{\n" +
                         "\t\"taskId\": 1234566, \n" +
                         "  \"taskType\": \"ping\",\n" +
@@ -157,17 +156,16 @@ public class Main2Activity extends Activity implements View.OnClickListener {
                         "    \"supportIPv6\": 2,\n" +
                         "    \"dnsMatch\": 0\n" +
                         "}";
-                new LastmileClient(Main2Activity.this).reviceInstructions(jsonString,null);
+                new LastmileClient(Main2Activity.this).reviceInstructions(jsonString);
                 break;
             case R.id.runTask:
                 Log.i(SWORD, "执行本地任务》》》》》》");
-               new LastmileClient(Main2Activity.this).startLocalTask();
+                new LastmileClient(Main2Activity.this).startLocalTask(null);
                 break;
 
 
-
-            case  R.id.receivePageTask:
-                String jsonPageString ="{\n" +
+            case R.id.receivePageTask:
+                String jsonPageString = "{\n" +
                         "    \"taskId\":1234567,\n" +
                         "    \"taskType\":\"page\",\n" +
                         "    \"groups\":[\n" +
@@ -204,7 +202,7 @@ public class Main2Activity extends Activity implements View.OnClickListener {
                         "    \"expireFrom\":\"2019-12-20 00:00:00\",\n" +
                         "    \"expireTo\":\"2020-12-20 23:59:59\"\n" +
                         "}";
-                new LastmileClient(Main2Activity.this).reviceInstructions(jsonPageString,null);
+                new LastmileClient(Main2Activity.this).reviceInstructions(jsonPageString);
                 break;
 
             case R.id.runPageTask:

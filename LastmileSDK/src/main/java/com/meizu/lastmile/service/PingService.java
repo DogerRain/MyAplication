@@ -30,12 +30,10 @@ public class PingService extends Thread {
 
     private Context context;
     private String pingJsonString;
-    private Options options;
 
-    public PingService(String pingJsonString, Context context, Options options) {
+    public PingService(String pingJsonString, Context context ) {
         this.context = context;
         this.pingJsonString = pingJsonString;
-        this.options = options;
     }
 
     @Override

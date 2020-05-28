@@ -17,12 +17,10 @@ public class ReceiveTaskService {
 
     private Context context;
     private String jsonString;
-    private Options options;
 
-    public ReceiveTaskService(Context context, String jsonString, Options options) {
+    public ReceiveTaskService(Context context, String jsonString) {
         this.context = context;
         this.jsonString = jsonString;
-        this.options = options;
     }
 
     public void receiveInstructions() {
@@ -31,15 +29,15 @@ public class ReceiveTaskService {
         String taskType = instruction.getTaskType();
         switch (taskType) {
             case ConstantUtils.PING:
-                PingService pingService = new PingService(jsonString, context,options);
+                PingService pingService = new PingService(jsonString, context);
                 pingService.start();
                 break;
             case ConstantUtils.PAGE:
-                PageAndDownloadService pageService = new PageAndDownloadService(jsonString, context,options);
+                PageAndDownloadService pageService = new PageAndDownloadService(jsonString, context);
                 pageService.start();
                 break;
             case ConstantUtils.DOWNLOAD:
-                PageAndDownloadService downloadService = new PageAndDownloadService(jsonString, context,options);
+                PageAndDownloadService downloadService = new PageAndDownloadService(jsonString, context);
                 downloadService.start();
                 break;
             default:
