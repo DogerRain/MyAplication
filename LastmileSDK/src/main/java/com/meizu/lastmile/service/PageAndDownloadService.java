@@ -8,6 +8,7 @@ import android.util.Log;
 import com.alibaba.fastjson.JSON;
 import com.meizu.lastmile.Utils.ConstantUtils;
 import com.meizu.lastmile.Utils.DatabaseHelper;
+import com.meizu.lastmile.requestObj.Options;
 import com.meizu.lastmile.requestObj.PageRequestObject;
 
 import org.apache.commons.lang3.StringUtils;
@@ -20,16 +21,18 @@ import java.util.List;
  * @Descriotion：接收任务，并存储在本地
  */
 
-public class PageService extends Thread {
+public class PageAndDownloadService extends Thread {
 
-    private String TAG = "LastMileSDK》》》 PageService";
+    private String TAG = "LastMileSDK》》》 PageAndDownloadService";
 
     private Context context;
-    String jsonString;
+    private String jsonString;
+    private Options options;
 
-    public PageService(String pingJsonString, Context context) {
+    public PageAndDownloadService(String jsonString, Context context, Options options) {
         this.context = context;
-        this.jsonString = pingJsonString;
+        this.jsonString = jsonString;
+        this.options = options;
     }
 
     @Override
@@ -45,7 +48,6 @@ public class PageService extends Thread {
      */
     public void receiveInstructionAndStorage() {
 
-
         if (StringUtils.isBlank(jsonString)) {
             return;
         }
@@ -53,13 +55,14 @@ public class PageService extends Thread {
         PageRequestObject pageRequestObject = JSON.parseObject(jsonString, PageRequestObject.class);
         //任务id
         String taskId = pageRequestObject.getTaskId();
+        String taskType = pageRequestObject.getTaskType();
         if (StringUtils.isBlank(taskId) || StringUtils.isBlank(pageRequestObject.getUrl()) || StringUtils.isBlank(pageRequestObject.getUrl())) {
             return;
         }
 
         String groupsJsonString = JSON.toJSONString(pageRequestObject.getGroups());
 
-        String tableStructure = "create table " + ConstantUtils.T_PAGE + "(" +
+        String tableStructure = "create table " + ConstantUtils.T_TASK + "(" +
                 "taskId varchar(50) PRIMARY KEY NOT NULL," +
                 "taskType varchar(50)," +
                 "url varchar(500)," +
@@ -104,13 +107,15 @@ public class PageService extends Thread {
         //
         command.append(" -o /dev/null -s -w  ");
         //参数
-        command.append("response_code:'\\t\\t'%{response_code}'\\n'content_type:'\\t\\t'%{content_type}'\\n'" +
-                "time_namelookup:'\\t'%{time_namelookup}'\\n'time_redirect:'\\t\\t'%{time_redirect}'\\n'" +
-                "num_redirects:'\\t\\t'%{num_redirects}'\\n'time_connect:'\\t\\t'%{time_connect}'\\n'" +
-                "time_appconnect:'\\t'%{time_appconnect}'\\n'time_pretransfer:'\\t'%{time_pretransfer}'\\n'" +
-                "time_starttransfer:'\\t'%{time_starttransfer}'\\n'time_total:'\\t\\t'%{time_total}'\\n'" +
-                "size_header:'\\t\\t'%{size_header}'\\n'size_download:'\\t\\t'%{size_download}'\\n'" +
-                "speed_download:'\\t\\t'%{speed_download}'\\n' ");
+//        command.append("response_code:'\\t\\t'%{response_code}'\\n'content_type:'\\t\\t'%{content_type}'\\n'" +
+//                "time_namelookup:'\\t'%{time_namelookup}'\\n'time_redirect:'\\t\\t'%{time_redirect}'\\n'" +
+//                "num_redirects:'\\t\\t'%{num_redirects}'\\n'time_connect:'\\t\\t'%{time_connect}'\\n'" +
+//                "time_appconnect:'\\t'%{time_appconnect}'\\n'time_pretransfer:'\\t'%{time_pretransfer}'\\n'" +
+//                "time_starttransfer:'\\t'%{time_starttransfer}'\\n'time_total:'\\t\\t'%{time_total}'\\n'" +
+//                "size_header:'\\t\\t'%{size_header}'\\n'size_download:'\\t\\t'%{size_download}'\\n'" +
+//                "speed_download:'\\t\\t'%{speed_download}'\\n' ");
+        command.append("%{response_code}:%{content_type}:%{time_namelookup}:%{time_redirect}:%{num_redirects}:%{time_connect}:" +
+                "%{time_appconnect}:%{time_pretransfer}:%{time_starttransfer}:%{time_total}:%{size_header}:%{size_download}:%{speed_download}'\\n' ");
 
         command.append(pageRequestObject.getUrl());
 
@@ -127,11 +132,11 @@ public class PageService extends Thread {
             //像ContentValues中存放数据
             values.put("taskId", taskId);
             values.put("taskType", pageRequestObject.getTaskType());
-            values.put("connectTimeout", pageRequestObject.getConnectTimeout());
-            values.put("maxTimeout", pageRequestObject.getMaxTimeout());
-            values.put("useRedirect", pageRequestObject.getUseRedirect());
-            values.put("httpHeaders", headerListJsonString);
-            values.put("hijacking", pageRequestObject.getHijacking());
+//            values.put("connectTimeout", pageRequestObject.getConnectTimeout());
+//            values.put("maxTimeout", pageRequestObject.getMaxTimeout());
+//            values.put("useRedirect", pageRequestObject.getUseRedirect());
+//            values.put("httpHeaders", headerListJsonString);
+//            values.put("hijacking", pageRequestObject.getHijacking());
             values.put("command", command.toString());
             values.put("groups", groupsJsonString);
 
@@ -148,22 +153,23 @@ public class PageService extends Thread {
 
 
             //2. 获取表是否存在，不存在则创建
-            if (!dbHelper.isTableExist(db, ConstantUtils.T_PAGE)) {
+            if (!dbHelper.isTableExist(db, ConstantUtils.T_TASK)) {
                 Log.i(TAG, "创建表》》》》》》");
                 dbHelper.createTable(db, tableStructure);
                 //不存在任务，插入任务
                 Log.i(TAG, "任务不存在，插入任务》》》》》");
-                dbHelper.insert(db, ConstantUtils.T_PAGE, values);
+                dbHelper.insert(db, ConstantUtils.T_TASK, values);
             } else {
                 //3.查任务是否存在
-                String[] placeholderValues = new String[]{taskId};
-                String selection = "taskId=?";
-                Boolean IsHasTaskId = dbHelper.queryTaskIdSQL(db, ConstantUtils.T_PAGE, new String[]{"taskId"}, selection, placeholderValues);
+                String[] placeholderValues = new String[]{taskId, taskType};
+                String selection = "taskId=? AND taskType=?";
+                Boolean IsHasTaskId = dbHelper.queryTaskIdSQL(db, ConstantUtils.T_TASK, new String[]{"taskId"}, selection, placeholderValues);
                 if (IsHasTaskId) {
                     //已经存在任务，更新任务
                     Log.i(TAG, "任务已存在，更新任务》》》》》");
-                    String[] condition = new String[]{taskId};
-                    dbHelper.update(db, ConstantUtils.T_PAGE, values, condition);
+                    String[] condition = new String[]{taskId, taskType};
+                    String whereClause = "taskId =? AND taskType =?";
+                    dbHelper.update(db, ConstantUtils.T_TASK, values, whereClause, condition);
                 }
             }
 

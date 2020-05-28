@@ -1,5 +1,7 @@
 package com.meizu.lastmile.responseObj;
 
+import java.math.BigDecimal;
+
 import lombok.Data;
 
 /**
@@ -12,47 +14,55 @@ public class PageResponseObject {
     /**
      * 总时间
      */
-    String timeTotal;
+    BigDecimal timeTotal;
     /**
      * DNS解析时间
      */
-    String timeNamelookup;
+    BigDecimal timeNamelookup;
     /**
      * 建立TCP连接时间
      */
-    String timeConnect;
+    BigDecimal timeTCP;
+
+    /**
+     * SSL握手时间
+     */
+    BigDecimal timeSSL;
     /**
      * 从开始到准备传输的时间
      */
-    String timePretransfer;
+    BigDecimal timePretransfer;
     /**
      * 首包时间（开始传输时间。在发出请求之后，Web 服务器返回数据的第一个字节所用的时间）
      */
-    String timeStarttransfer;
+    BigDecimal timeStarttransfer;
 
     /**
      * 总下载字节数
      */
-    String sizeDownload;
+    BigDecimal sizeDownload;
 
     /**
      * header下载大小
      */
-    String sizeHeader;
+    BigDecimal sizeHeader;
 
     /**
      * 下载速度
      */
-    String speedDownload;
+    BigDecimal speedDownload;
     /**
      * 重定向时间
      */
-    String timeRedirect;
+    BigDecimal timeRedirect;
     /**
      * 重定向次数
      */
     String numRedirects;
-
+    /**
+     * 最近传输中建立的新连接数
+     */
+//    String numConnects;
 
     /**
      * 返回码
@@ -67,11 +77,20 @@ public class PageResponseObject {
     /**
      * 客户端时间
      */
-    String clientTime;
+    BigDecimal clientTime;
+
+    /**
+     * 内容下载时间
+     */
+    BigDecimal downloadTime;
     /**
      * 可用性
      */
     String usability;
+
+
+    Boolean result;
+    StringBuffer resultBuffer;
 
 
 }

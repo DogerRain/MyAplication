@@ -31,15 +31,16 @@ public class ReceiveTaskService {
         String taskType = instruction.getTaskType();
         switch (taskType) {
             case ConstantUtils.PING:
-                PingService pingService = new PingService(jsonString, context);
+                PingService pingService = new PingService(jsonString, context,options);
                 pingService.start();
                 break;
             case ConstantUtils.PAGE:
-                PageService pageService = new PageService(jsonString,context);
+                PageAndDownloadService pageService = new PageAndDownloadService(jsonString, context,options);
                 pageService.start();
                 break;
             case ConstantUtils.DOWNLOAD:
-
+                PageAndDownloadService downloadService = new PageAndDownloadService(jsonString, context,options);
+                downloadService.start();
                 break;
             default:
                 break;

@@ -10,9 +10,6 @@ import lombok.Data;
  * @CreateDate:
  */
 @Data
-//@Builder
-//@NoArgsConstructor
-//@AllArgsConstructor
 public class Group {
     /**
      * 名称

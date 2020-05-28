@@ -44,8 +44,6 @@ public class TaskTriggerService {
      */
     private void startPingTask() {
         Log.i(TAG, "启动ping任务呀");
-        PingRunLocalTaskService pingRunLocalTaskService = new PingRunLocalTaskService(context);
-        pingRunLocalTaskService.start();
     }
 
 
@@ -54,6 +52,7 @@ public class TaskTriggerService {
      */
     private void startSingleWebTask() {
         Log.i(TAG, "启动网页任务");
+
     }
 
     /**

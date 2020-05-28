@@ -118,8 +118,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param tableName
      * @param values
      */
-    public void update(SQLiteDatabase db, String tableName, ContentValues values, String[] taskId) {
-        db.update(tableName, values, "taskId=?", taskId);
+    public void update(SQLiteDatabase db, String tableName, ContentValues values, String whereClause,String[] taskId) {
+        db.update(tableName, values, whereClause, taskId);
     }
 
     /**
@@ -129,9 +129,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param tableName
      * @param values
      */
-    public void delete(SQLiteDatabase db, String tableName, String[] values) {
+    public void delete(SQLiteDatabase db, String tableName, String whereClause,String[] values) {
 
-        db.delete(tableName, "taskId=? ", values);
+        db.delete(tableName, whereClause, values);
     }
 
 //    public void exceCustomSQL(SQLiteDatabase db, String sql) {

@@ -16,7 +16,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -27,55 +26,47 @@ import java.util.Map;
  * @Description: 执行本地任务
  */
 
-public class PingRunLocalTaskService extends Thread {
+public class RunLocalTaskService extends Thread {
     private String TAG = "LastMileSDK》》》 PingRunLocalTaskService";
 
     private Context context;
 
-    public PingRunLocalTaskService(Context context) {
+    public RunLocalTaskService(Context context) {
         this.context = context;
     }
 
     @Override
     public void run() {
-        getLocalPingTask();
+        getLocalTaskExcuse();
     }
-
 
     /**
      * 触发调用本地Ping任务
      */
-    public void getLocalPingTask() {
+    public void getLocalTaskExcuse() {
 
         //1. 获取本地数据库
         DatabaseHelper dbHelper = new DatabaseHelper(context);
         //2. 取得一个的数据库对象
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         //3 判断表是否存在
-        if (!dbHelper.isTableExist(db, ConstantUtils.T_PING)) {
+        if (!dbHelper.isTableExist(db, ConstantUtils.T_TASK)) {
             //不存在证明用户可能清除了数据
             return;
         }
         //4.查询本地任务，把命令取出
         String[] selectColumnName = new String[]{"taskId", "command", "lastExecuteTime", "expireFrom", "expireTo", "groups", "monitorFrequency", "executeTimeStart", "executeTimeEnd", "isExecute"};
-        List<Map<String, String>> list = dbHelper.queryTask(db, ConstantUtils.T_PING, selectColumnName, null, null);
+        List<Map<String, String>> list = dbHelper.queryTask(db, ConstantUtils.T_TASK, selectColumnName, null, null);
         for (Map<String, String> hashmap : list) {
             try {
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 Date start = new Date();
-                Long time = start.getTime();
                 //1 判断是否在有效期内
                 String expireFrom = hashmap.get("expireFrom");
                 String expireTo = hashmap.get("expireTo");
-                if (StringUtils.isNotBlank(expireFrom)) {
-                    long subHourExpireFrom = CommonUtils.getHourSub(formatter.parse(expireFrom), start);
-                    if (subHourExpireFrom < 0) {
-                        continue;
-                    }
-                }
-                if (StringUtils.isNotBlank(expireTo)) {
-                    long subHourExpireTo = CommonUtils.getHourSub(start, formatter.parse(expireTo));
-                    if (subHourExpireTo < 0) {
+                if (StringUtils.isNotBlank(expireFrom) && StringUtils.isNotBlank(expireTo)) {
+                    long subHourExpireFrom = CommonUtils.getSecondeSub(CommonUtils.YYYY_MM_ddd_HH_mm_ss.parse(expireFrom), start);
+                    long subHourExpireTo = CommonUtils.getSecondeSub(CommonUtils.YYYY_MM_ddd_HH_mm_ss.parse(expireTo), start);
+                    if (subHourExpireFrom < 0 || subHourExpireTo > 0) {
                         continue;
                     }
                 }
@@ -84,7 +75,7 @@ public class PingRunLocalTaskService extends Thread {
                 String lastExecuteTime = hashmap.get("lastExecuteTime");
                 //判断是否首次
                 if (StringUtils.isNotBlank(lastExecuteTime)) {
-                    Date last = formatter.parse(lastExecuteTime);
+                    Date last = CommonUtils.YYYY_MM_ddd_HH_mm_ss.parse(lastExecuteTime);
                     long subHour = CommonUtils.getHourSub(start, last);
 //                    monitorFrequency为空表示执行
                     if (StringUtils.isNotBlank(hashmap.get("monitorFrequency"))) {
@@ -94,12 +85,32 @@ public class PingRunLocalTaskService extends Thread {
                             continue;
                         }
                     }
-
                 }
 
-
                 //取监控计划
-                String isExecute =hashmap.get("isExecute");
+                String isExecute = hashmap.get("isExecute");
+                String executeTimeStart = hashmap.get("executeTimeStart");
+                String executeTimeEnd = hashmap.get("executeTimeEnd");
+                if (StringUtils.isNotBlank(isExecute) && StringUtils.isNotBlank(executeTimeStart) && StringUtils.isNotBlank(executeTimeEnd)) {
+                    int executeTimeStartLong = Integer.parseInt(executeTimeStart);
+                    int executeTimeEndLong = Integer.parseInt(executeTimeEnd);
+                    int now = CommonUtils.getHour(start);
+                    if (isExecute.equals("1")) {
+                        //1 表示在特定时间内执行
+                        // executeTimeStartLong <= a < executeTimeEndLong      1:00 <= a < 3:00
+                        if (now < executeTimeStartLong || now >= executeTimeEndLong) {
+                            //不命中范围
+                            continue;
+                        }
+
+                    } else {
+                        // 0 表示在特定的时间内不执行
+                        if (now >= executeTimeStartLong && now < executeTimeEndLong + 1) {
+                            //命中范围
+                            continue;
+                        }
+                    }
+                }
 
                 //取command命令
                 String commad = hashmap.get("command") + "";
@@ -108,28 +119,29 @@ public class PingRunLocalTaskService extends Thread {
 
                 System.out.println(pingResponseObject);
                 //上传到大数据那边
+
 //                pingResponseObjece
 
 
 //                执行完成，更新上一次执行时间
-                String startString = formatter.format(start);
+                String startString = CommonUtils.YYYY_MM_ddd_HH_mm_ss.format(start);
                 ContentValues values = new ContentValues();
                 values.put("lastExecuteTime", startString);
-                dbHelper.update(db, ConstantUtils.T_PING, values, new String[]{hashmap.get("taskId") + ""});
+                String whereClause = "taskId =? AND taskType =?";
+                dbHelper.update(db, ConstantUtils.T_TASK, values, whereClause, new String[]{hashmap.get("taskId") + ""});
             } catch (ParseException e) {
-                Log.e(TAG, "日期转换失败",e);
+                Log.e(TAG, "日期转换失败", e);
             } catch (Exception e) {
-                Log.e(TAG, "未知错误",e);
+                Log.e(TAG, "未知错误", e);
             } finally {
                 if (db != null) {
                     db.close();
                 }
             }
-
         }
     }
 
-    private PingResponseObject analysePingCommand(String command) {
+    public PingResponseObject analysePingCommand(String command) {
         String line = null;
         Process process = null;
         BufferedReader successReader = null;
@@ -231,4 +243,10 @@ public class PingRunLocalTaskService extends Thread {
         pingResponseObject.setResult(true);
         return pingResponseObject;
     }
+
+
+    public static void main(String[] args) {
+        System.out.println(StringUtils.isBlank("   "));
+    }
+
 }

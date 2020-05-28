@@ -8,6 +8,7 @@ import android.util.Log;
 import com.alibaba.fastjson.JSON;
 import com.meizu.lastmile.Utils.ConstantUtils;
 import com.meizu.lastmile.Utils.DatabaseHelper;
+import com.meizu.lastmile.requestObj.Options;
 import com.meizu.lastmile.requestObj.PingRequestObject;
 import com.meizu.lastmile.responseObj.PingResponseObject;
 
@@ -28,11 +29,13 @@ public class PingService extends Thread {
     private String TAG = "LastMileSDK》》》 PingService";
 
     private Context context;
-    String pingJsonString;
+    private String pingJsonString;
+    private Options options;
 
-    public PingService(String pingJsonString, Context context) {
+    public PingService(String pingJsonString, Context context, Options options) {
         this.context = context;
         this.pingJsonString = pingJsonString;
+        this.options = options;
     }
 
     @Override
@@ -63,13 +66,12 @@ public class PingService extends Thread {
 
         //任务id
         String taskId = pingRequestObject.getTaskId();
+        String taskType = pingRequestObject.getTaskType();
         if (StringUtils.isBlank(taskId)) {
             return;
         }
 
-
         String groupsJsonString = JSON.toJSONString(pingRequestObject.getGroups());
-
 
         String tableStructure = "create table " + ConstantUtils.T_PING + "(" +
                 "taskId varchar(50) PRIMARY KEY NOT NULL," +
@@ -152,14 +154,16 @@ public class PingService extends Thread {
 
             //3.查任务是否存在
 //            String queryTaskIdSQL = "select * from " + ConstantUtils.T_PING + " where taskId=?";
-            String[] placeholderValues = new String[]{taskId};
-            String selection = "taskId=?";
+            //3.查任务是否存在
+            String[] placeholderValues = new String[]{taskId, taskType};
+            String selection = "taskId=? AND taskType=?";
             Boolean IsHasTaskId = dbHelper1.queryTaskIdSQL(db1, ConstantUtils.T_PING, new String[]{"taskId"}, selection, placeholderValues);
             if (IsHasTaskId) {
                 //已经存在任务，更新任务
                 Log.i(TAG, "任务已存在，更新任务》》》》》");
-                String[] condition = new String[]{taskId};
-                dbHelper1.update(db1, ConstantUtils.T_PING, values, condition);
+                String[] condition = new String[]{taskId, taskType};
+                String whereClause = "taskId =? AND taskType =?";
+                dbHelper1.update(db1, ConstantUtils.T_PING, values, whereClause, condition);
             } else {
                 //不存在任务，插入任务
                 Log.i(TAG, "任务不存在，插入任务》》》》》");

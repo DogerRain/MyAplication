@@ -6,8 +6,10 @@ import android.net.NetworkInfo;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -25,6 +27,8 @@ public class CommonUtils {
     public static final int NETWORK_MOBILE = 1;
     //无线网络
     public static final int NETWORW_WIFI = 2;
+
+    public static SimpleDateFormat YYYY_MM_ddd_HH_mm_ss = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     /**
      * 判断当前网络是否为 Wifi 网络连接
@@ -107,11 +111,47 @@ public class CommonUtils {
     }
 
     public static long getHourSub(Date startDate, Date endDate) {
-        long hour = 0;
-        hour = (endDate.getTime() - startDate.getTime()) / (1 * 24 * 60 * 60 * 1000);
-        return hour;
+        return (endDate.getTime() - startDate.getTime()) / ( 1 * 60 * 60 * 1000);
+    }
+    public static long getMinuteSub(Date startDate, Date endDate) {
+        //返回分钟
+        return (endDate.getTime() - startDate.getTime()) / (1 * 1 * 60 * 1000);
+    }
+    public static long getSecondeSub(Date startDate, Date endDate) {
+        //返回秒
+        return (endDate.getTime() - startDate.getTime()) / (1 * 1 * 1 * 1000);
     }
 
 
+    public static int getHour(String strDate) {
+        Calendar calendar = Calendar.getInstance();
+        try {
+            Date date = YYYY_MM_ddd_HH_mm_ss.parse(strDate);
+            calendar.setTime(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return calendar.get(Calendar.HOUR_OF_DAY);
+    }
+
+    public static int getHour(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        return calendar.get(Calendar.HOUR_OF_DAY);
+    }
+
+    public static void main(String[] args) {
+        try {
+            Date date = YYYY_MM_ddd_HH_mm_ss.parse("2020-05-26 16:11:30");
+            Date date1 =  YYYY_MM_ddd_HH_mm_ss.parse("2020-05-26 16:11:20");
+            System.out.println(getHourSub(date,date1));
+            System.out.println(getSecondeSub(date,date1));
+//            System.out.println(getHour(new Date()));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+//        System.out.println(getHour(strDate));
+
+    }
 
 }

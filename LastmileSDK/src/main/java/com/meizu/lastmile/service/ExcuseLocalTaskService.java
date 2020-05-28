@@ -5,10 +5,14 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.alibaba.fastjson.JSON;
 import com.meizu.lastmile.Utils.CommonUtils;
 import com.meizu.lastmile.Utils.ConstantUtils;
 import com.meizu.lastmile.Utils.DatabaseHelper;
+import com.meizu.lastmile.requestObj.Group;
+import com.meizu.lastmile.requestObj.Options;
 import com.meizu.lastmile.responseObj.PageResponseObject;
+import com.meizu.lastmile.responseObj.PingResponseObject;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -17,76 +21,73 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+
 /**
- * @Author: huangyongwen
- * @CreateDate: 2020/5/25 14:52
- * @Description: 执行本地任务
+ * @Author huangyongwen
+ * @CreateDate 2020/5/28 10:20
+ * @params
+ * @Description 运行本地任务的公共类
  */
 
-public class PageRunLocalTaskService extends Thread {
-    private String TAG = "LastMileSDK》》》 PageRunLocalTaskService";
+public class ExcuseLocalTaskService extends Thread {
+
+    private String TAG = "LastMileSDK》》》 ExcuseLocalTaskService";
 
     private Context context;
+    private String taskType;
+    private String tableName;
+    private Options options;
 
-    public PageRunLocalTaskService(Context context) {
+    public ExcuseLocalTaskService(Context context, String taskType, String tableName, Options options) {
         this.context = context;
+        this.taskType = taskType;
+        this.tableName = tableName;
+        this.options = options;
+
     }
 
     @Override
     public void run() {
-        getLocalPingTask();
+        excuseLocalTask();
     }
 
-
-    /**
-     * 触发调用本地Ping任务
-     */
-    public void getLocalPingTask() {
-
+    public void excuseLocalTask() {
         //1. 获取本地数据库
         DatabaseHelper dbHelper = new DatabaseHelper(context);
         //2. 取得一个的数据库对象
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         //3 判断表是否存在
-        if (!dbHelper.isTableExist(db, ConstantUtils.T_TASK)) {
+        if (!dbHelper.isTableExist(db, tableName)) {
             //不存在证明用户可能清除了数据
-
             return;
         }
         //4.查询本地任务，把命令取出
         String[] selectColumnName = new String[]{"taskId", "taskType", "command", "lastExecuteTime", "expireFrom", "expireTo", "groups", "monitorFrequency", "executeTimeStart", "executeTimeEnd", "isExecute"};
-        List<Map<String, String>> list = dbHelper.queryTask(db, ConstantUtils.T_TASK, selectColumnName, null, null);
+        String slection = "taskType=?";
+        String[] condition = new String[]{taskType};
+        List<Map<String, String>> list = dbHelper.queryTask(db, tableName, selectColumnName, slection, condition);
         for (Map<String, String> hashmap : list) {
             try {
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 Date start = new Date();
-                Long time = start.getTime();
                 //1 判断是否在有效期内
                 String expireFrom = hashmap.get("expireFrom");
                 String expireTo = hashmap.get("expireTo");
-                if (StringUtils.isNotBlank(expireFrom)) {
-                    long subHourExpireFrom = CommonUtils.getHourSub(formatter.parse(expireFrom), start);
-                    if (subHourExpireFrom < 0) {
+                if (StringUtils.isNotBlank(expireFrom) && StringUtils.isNotBlank(expireTo)) {
+                    long subHourExpireFrom = CommonUtils.getSecondeSub(CommonUtils.YYYY_MM_ddd_HH_mm_ss.parse(expireFrom), start);
+                    long subHourExpireTo = CommonUtils.getSecondeSub(CommonUtils.YYYY_MM_ddd_HH_mm_ss.parse(expireTo), start);
+                    if (subHourExpireFrom < 0 || subHourExpireTo > 0) {
                         continue;
                     }
                 }
-                if (StringUtils.isNotBlank(expireTo)) {
-                    long subHourExpireTo = CommonUtils.getHourSub(start, formatter.parse(expireTo));
-                    if (subHourExpireTo < 0) {
-                        continue;
-                    }
-                }
-
                 //2 . 判断上一次执行时间是否在频率之内
                 String lastExecuteTime = hashmap.get("lastExecuteTime");
                 //判断是否首次
                 if (StringUtils.isNotBlank(lastExecuteTime)) {
-                    Date last = formatter.parse(lastExecuteTime);
+                    Date last = CommonUtils.YYYY_MM_ddd_HH_mm_ss.parse(lastExecuteTime);
                     long subHour = CommonUtils.getHourSub(start, last);
 //                    monitorFrequency为空表示执行
                     if (StringUtils.isNotBlank(hashmap.get("monitorFrequency"))) {
@@ -97,26 +98,50 @@ public class PageRunLocalTaskService extends Thread {
                         }
                     }
                 }
-
                 //取监控计划
                 String isExecute = hashmap.get("isExecute");
+                String executeTimeStart = hashmap.get("executeTimeStart");
+                String executeTimeEnd = hashmap.get("executeTimeEnd");
+                if (StringUtils.isNotBlank(isExecute) && StringUtils.isNotBlank(executeTimeStart) && StringUtils.isNotBlank(executeTimeEnd)) {
+                    int executeTimeStartLong = Integer.parseInt(executeTimeStart);
+                    int executeTimeEndLong = Integer.parseInt(executeTimeEnd);
+                    int now = CommonUtils.getHour(start);
+                    if (isExecute.equals("1")) {
+                        //1 表示在特定时间内执行
+                        // executeTimeStartLong <= a < executeTimeEndLong      1:00 <= a < 3:00
+                        if (now < executeTimeStartLong || now >= executeTimeEndLong) {
+                            //不命中范围
+                            continue;
+                        }
+                    } else {
+                        // 0 表示在特定的时间内不执行
+                        if (now >= executeTimeStartLong && now < executeTimeEndLong + 1) {
+                            //命中范围
+                            continue;
+                        }
+                    }
+                }
 
+                //取group
+                Group group = JSON.parseObject(hashmap.get("group"), Group.class);
                 //取command命令
                 String commad = hashmap.get("command") + "";
-                //解析命令
 
-                PageResponseObject pageResponseObject = analyseCurlCommand(commad);
-                System.out.println(pageResponseObject);
+                switch (taskType){
+
+                }
+
+//                System.out.println(pingResponseObject);
                 //上传到大数据那边
-//                pingResponseObjece
+
 
 
 //                执行完成，更新上一次执行时间
-                String startString = formatter.format(start);
+                String startString = CommonUtils.YYYY_MM_ddd_HH_mm_ss.format(start);
                 ContentValues values = new ContentValues();
                 values.put("lastExecuteTime", startString);
                 String whereClause = "taskId =? AND taskType =?";
-                dbHelper.update(db, ConstantUtils.T_TASK, values, whereClause, new String[]{hashmap.get("taskId") + "", hashmap.get("taskType") + ""});
+                dbHelper.update(db, ConstantUtils.T_TASK, values, whereClause, new String[]{hashmap.get("taskId") + ""});
             } catch (ParseException e) {
                 Log.e(TAG, "日期转换失败", e);
             } catch (Exception e) {
@@ -126,8 +151,74 @@ public class PageRunLocalTaskService extends Thread {
                     db.close();
                 }
             }
-
         }
+
+    }
+
+    /**
+     * 组装结果
+     *
+     * @param stringBuffer
+     * @param text
+     */
+    private static void append(StringBuffer stringBuffer, String text) {
+        if (stringBuffer != null) {
+            stringBuffer.append(text + "\n");
+        }
+    }
+
+    private PingResponseObject analysePingCommand(String command) {
+        String line = null;
+        Process process = null;
+        BufferedReader successReader = null;
+        StringBuffer resultStringBuffer = new StringBuffer("");
+        PingResponseObject pingResponseObject = new PingResponseObject();
+        pingResponseObject.setResultBuffer(resultStringBuffer);
+        try {
+            process = Runtime.getRuntime().exec(command);
+            if (process == null) {
+                Log.e(TAG, "  fail:process is null.");
+                append(pingResponseObject.getResultBuffer(), " fail:process is null.");
+                pingResponseObject.setResult(false);
+                return pingResponseObject;
+            }
+            successReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            while ((line = successReader.readLine()) != null) {
+                //规则解析
+                getPingResultByMatchingRules(pingResponseObject, line);
+            }
+            // 0 表示执行成功，有返回
+            int status = process.waitFor();
+            if (status == 0) {
+                Log.i(TAG, "exec cmd success:" + command);
+                append(pingResponseObject.getResultBuffer(), "exec cmd success:" + command);
+                pingResponseObject.setResult(true);
+            } else {
+                Log.e(TAG, "exec cmd fail.");
+                append(pingResponseObject.getResultBuffer(), "exec cmd fail.");
+                pingResponseObject.setResult(false);
+            }
+            Log.i(TAG, "exec finished.");
+            append(pingResponseObject.getResultBuffer(), "exec finished.");
+
+        } catch (IOException e) {
+            Log.e(TAG, String.valueOf(e));
+        } catch (InterruptedException e) {
+            Log.e(TAG, String.valueOf(e));
+        } finally {
+            Log.i(TAG, "command exit.");
+            if (process != null) {
+                process.destroy();
+            }
+            if (successReader != null) {
+                try {
+                    successReader.close();
+                } catch (IOException e) {
+                    Log.e(TAG, String.valueOf(e));
+                }
+            }
+        }
+        return pingResponseObject;
     }
 
     private PageResponseObject analyseCurlCommand(String command) {
@@ -150,8 +241,6 @@ public class PageRunLocalTaskService extends Thread {
             while ((line = successReader.readLine()) != null) {
                 //规则解析
                 getCurlResultByMatchingRules(pageResponseObject, line);
-
-
             }
             // 0 表示执行成功，有返回
             int status = process.waitFor();
@@ -187,16 +276,40 @@ public class PageRunLocalTaskService extends Thread {
         return pageResponseObject;
     }
 
-    /**
-     * 组装curl结果
-     *
-     * @param stringBuffer
-     * @param text
-     */
-    private static void append(StringBuffer stringBuffer, String text) {
-        if (stringBuffer != null) {
-            stringBuffer.append(text + "\n");
+
+    private PingResponseObject getPingResultByMatchingRules(PingResponseObject pingResponseObject, String line) {
+        if (line.contains("ping: unknown host")) {
+            append(pingResponseObject.getResultBuffer(), line);
+            pingResponseObject.setResult(false);
+            return pingResponseObject;
         }
+        //解析每一行
+        if (line.contains("packets transmitted,")) {
+            String transmittedPackages = line.substring(0, line.indexOf("packets transmitted,")).trim();
+            String receivedPackages = line.substring(line.indexOf("packets transmitted,") + "packets transmitted,".length(), line.indexOf("received")).trim();
+            String packetLossRate = line.substring(line.indexOf("received,") + "received,".length(), line.indexOf("packet loss")).trim();
+            String sendUsedTime = line.substring(line.indexOf("time") + "time".length(), line.indexOf("ms")).trim();
+
+            pingResponseObject.setTransmittedPackages(transmittedPackages);
+            pingResponseObject.setReceivedPackages(receivedPackages);
+            pingResponseObject.setPacketLossRate(packetLossRate);
+            pingResponseObject.setSendUsedTime(sendUsedTime);
+        }
+        if (line.contains("rtt min/avg/max/mdev")) {
+            String detailString = line.substring(line.indexOf("rtt min/avg/max/mdev =") + "rtt min/avg/max/mdev =".length(), line.indexOf("ms"));
+            detailString = detailString.trim();
+            String[] split = detailString.split("/");
+            String minDelayedTime = split[0];
+            String avgDelayedTime = split[1];
+            String maxDelayedTime = split[2];
+            String mdevDelayedTime = split[3];
+            pingResponseObject.setMinDelayedTime(minDelayedTime);
+            pingResponseObject.setAvgDelayedTime(avgDelayedTime);
+            pingResponseObject.setMaxDelayedTime(maxDelayedTime);
+            pingResponseObject.setMdevDelayedTime(mdevDelayedTime);
+        }
+        pingResponseObject.setResult(true);
+        return pingResponseObject;
     }
 
 
@@ -256,76 +369,14 @@ public class PageRunLocalTaskService extends Thread {
         pageResponseObject.setSizeDownload(sizeDownload);
         BigDecimal speedDownload = new BigDecimal(values[12].trim()).divide(bigDecimal1024, 2, BigDecimal.ROUND_HALF_UP);
         pageResponseObject.setSpeedDownload(speedDownload);
-
         pageResponseObject.setResult(true);
         return pageResponseObject;
-
-        /*if (line.contains("response_code")) {
-            String responseCode = line.split(":")[1].trim();
-            pageResponseObject.setResponseCode(responseCode);
-        }
-        if (line.contains("content_type")) {
-            String contentType = line.split(":")[1].trim();
-            pageResponseObject.setContentType(contentType);
-        }
-        if (line.contains("time_namelookup")) {
-            String values = line.split(":")[1].trim();
-            pageResponseObject.setTimeNamelookup(values);
-        }
-        if (line.contains("time_redirect")) {
-            String values = line.split(":")[1].trim();
-            pageResponseObject.setTimeNamelookup(values);
-        }
-        if (line.contains("time_connect")) {
-            String values = line.split(":")[1].trim();
-            pageResponseObject.setTimeNamelookup(values);
-        }
-        if (line.contains("time_appconnect")) {
-            String values = line.split(":")[1].trim();
-            pageResponseObject.setTimeNamelookup(values);
-        }
-        if (line.contains("time_pretransfer")) {
-            String values = line.split(":")[1].trim();
-            pageResponseObject.setTimeNamelookup(values);
-        }
-        if (line.contains("time_starttransfer")) {
-            String values = line.split(":")[1].trim();
-            pageResponseObject.setTimeNamelookup(values);
-        }
-        if (line.contains("time_total")) {
-            String values = line.split(":")[1].trim();
-            pageResponseObject.setTimeNamelookup(values);
-        }
-        if (line.contains("size_header")) {
-            String values = line.split(":")[1].trim();
-            pageResponseObject.setTimeNamelookup(values);
-        }
-        if (line.contains("size_download")) {
-            String values = line.split(":")[1].trim();
-            pageResponseObject.setTimeNamelookup(values);
-        }
-        if (line.contains("speed_download")) {
-            String values = line.split(":")[1].trim();
-            pageResponseObject.setTimeNamelookup(values);
-        }*/
-
-
     }
 
-    public BigDecimal transformMSValue(String value, BigDecimal bigDecimal) {
+    private BigDecimal transformMSValue(String value, BigDecimal bigDecimal) {
         if (StringUtils.isBlank(value)) {
             return null;
         }
         return new BigDecimal(value.trim()).multiply(bigDecimal).setScale(0);
-    }
-
-    public static void main(String[] args) throws ParseException {
-        BigDecimal bd = new BigDecimal(495);
-        BigDecimal a = bd.divide(new BigDecimal("1024"), 4, BigDecimal.ROUND_HALF_UP);
-        BigDecimal b = new BigDecimal("0.371").subtract(new BigDecimal("0.329")).multiply(new BigDecimal("1000")).setScale(0);
-        System.out.println(a);
-        System.out.println(b);
-
-
     }
 }
