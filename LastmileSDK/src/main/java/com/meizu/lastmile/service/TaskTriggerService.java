@@ -1,7 +1,6 @@
 package com.meizu.lastmile.service;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.meizu.lastmile.Utils.CommonUtils;
 import com.meizu.lastmile.Utils.ConstantUtils;
@@ -29,8 +28,8 @@ public class TaskTriggerService {
         switch (flag) {
             case CommonUtils.NETWORW_WIFI:
                 startPingTask(options);
-                startSingleWebTask(options);
-                startFileDownloadTask(options);
+//                startSingleWebTask(options);
+//                startFileDownloadTask(options);
                 break;
             case CommonUtils.NETWORK_MOBILE:
                 startPingTask(options);
@@ -46,7 +45,6 @@ public class TaskTriggerService {
      */
     private void startPingTask(Options options) {
         new ExcuseLocalTaskService(context, ConstantUtils.PING, ConstantUtils.T_PING, options).start();
-        Log.i(TAG, "启动ping任务呀");
     }
 
 
@@ -55,7 +53,6 @@ public class TaskTriggerService {
      */
     private void startSingleWebTask(Options options) {
         new ExcuseLocalTaskService(context, ConstantUtils.PAGE, ConstantUtils.T_PAGE_DOWNLOAD, options).start();
-        Log.i(TAG, "启动网页任务");
 
     }
 
@@ -64,7 +61,6 @@ public class TaskTriggerService {
      */
     private void startFileDownloadTask(Options options) {
         new ExcuseLocalTaskService(context, ConstantUtils.DOWNLOAD, ConstantUtils.T_PAGE_DOWNLOAD, options).start();
-        Log.i(TAG, "启动文件下载任务");
     }
 
 }

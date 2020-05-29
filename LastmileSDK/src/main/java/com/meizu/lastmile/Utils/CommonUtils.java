@@ -144,9 +144,10 @@ public class CommonUtils {
         try {
             Date date = YYYY_MM_ddd_HH_mm_ss.parse("2020-05-26 16:11:30");
             Date date1 =  YYYY_MM_ddd_HH_mm_ss.parse("2020-05-26 16:11:20");
+            Date date3 =  YYYY_MM_ddd_HH_mm_ss.parse("2020-05-26 00:11:20");
             System.out.println(getHourSub(date,date1));
             System.out.println(getSecondeSub(date,date1));
-//            System.out.println(getHour(new Date()));
+            System.out.println(getHour(date3));
         } catch (ParseException e) {
             e.printStackTrace();
         }

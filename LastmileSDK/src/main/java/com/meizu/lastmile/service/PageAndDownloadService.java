@@ -8,7 +8,6 @@ import android.util.Log;
 import com.alibaba.fastjson.JSON;
 import com.meizu.lastmile.Utils.ConstantUtils;
 import com.meizu.lastmile.Utils.DatabaseHelper;
-import com.meizu.lastmile.requestObj.Options;
 import com.meizu.lastmile.requestObj.PageRequestObject;
 
 import org.apache.commons.lang3.StringUtils;
@@ -60,7 +59,7 @@ public class PageAndDownloadService extends Thread {
 
         String groupsJsonString = JSON.toJSONString(pageRequestObject.getGroups());
 
-        String tableStructure = "create table " + ConstantUtils.T_TASK + "(" +
+        String tableStructure = "create table " + ConstantUtils.T_PAGE_DOWNLOAD + "(" +
                 "taskId varchar(50) PRIMARY KEY NOT NULL," +
                 "taskType varchar(50)," +
                 "url varchar(500)," +
@@ -100,7 +99,7 @@ public class PageAndDownloadService extends Thread {
             command.append(" -H '" + header + "'");
         }
         command.append(" --connect-timeout " + pageRequestObject.getConnectTimeout());
-        command.append("--max-time " + pageRequestObject.getMaxTimeout());
+        command.append(" --max-time " + pageRequestObject.getMaxTimeout());
 
         //
         command.append(" -o /dev/null -s -w  ");
@@ -151,23 +150,26 @@ public class PageAndDownloadService extends Thread {
 
 
             //2. 获取表是否存在，不存在则创建
-            if (!dbHelper.isTableExist(db, ConstantUtils.T_TASK)) {
+            if (!dbHelper.isTableExist(db, ConstantUtils.T_PAGE_DOWNLOAD)) {
                 Log.i(TAG, "创建表》》》》》》");
                 dbHelper.createTable(db, tableStructure);
                 //不存在任务，插入任务
                 Log.i(TAG, "任务不存在，插入任务》》》》》");
-                dbHelper.insert(db, ConstantUtils.T_TASK, values);
+                dbHelper.insert(db, ConstantUtils.T_PAGE_DOWNLOAD, values);
             } else {
                 //3.查任务是否存在
                 String[] placeholderValues = new String[]{taskId, taskType};
                 String selection = "taskId=? AND taskType=?";
-                Boolean IsHasTaskId = dbHelper.queryTaskIdSQL(db, ConstantUtils.T_TASK, new String[]{"taskId"}, selection, placeholderValues);
+                Boolean IsHasTaskId = dbHelper.queryTaskIdSQL(db, ConstantUtils.T_PAGE_DOWNLOAD, new String[]{"taskId"}, selection, placeholderValues);
                 if (IsHasTaskId) {
                     //已经存在任务，更新任务
                     Log.i(TAG, "任务已存在，更新任务》》》》》");
                     String[] condition = new String[]{taskId, taskType};
                     String whereClause = "taskId =? AND taskType =?";
-                    dbHelper.update(db, ConstantUtils.T_TASK, values, whereClause, condition);
+                    dbHelper.update(db, ConstantUtils.T_PAGE_DOWNLOAD, values, whereClause, condition);
+                }else {
+                    Log.i(TAG, "任务不存在，插入任务》》》》》");
+                    dbHelper.insert(db, ConstantUtils.T_PAGE_DOWNLOAD, values);
                 }
             }
 

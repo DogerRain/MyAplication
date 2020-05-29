@@ -44,8 +44,10 @@ public class PageRequestObject extends Instruction {
      */
 
     String expectContaining;
-
-
+    /**
+     * 预期MD5验证
+     */
+    String md5  ;
 
     /**
      * 上一次执行时间

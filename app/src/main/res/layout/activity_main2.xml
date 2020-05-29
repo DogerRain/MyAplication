@@ -44,30 +44,36 @@
 
 
     <Button
-        android:id="@+id/receiveTask"
+        android:id="@+id/receivePingTask"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="receiveTask" />
+        android:text="模拟发送ping任务" />
 
-
-    <Button
-        android:id="@+id/runTask"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="runTask" />
 
     <Button
         android:id="@+id/receivePageTask"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="receivePageTask" />
+        android:text="模拟发送page任务" />
+
+    <Button
+        android:id="@+id/receiveFiledownloadTask"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="模拟发送filedownload任务" />
 
 
     <Button
-        android:id="@+id/runPageTask"
+        android:id="@+id/runLocalTask"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="runPageTask" />
+        android:text="模拟用户触发，执行本地任务" />
+
+    <Button
+        android:id="@+id/myButton"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="自定义命令" />
 
 
     <TextView

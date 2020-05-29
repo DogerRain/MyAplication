@@ -11,6 +11,7 @@ import android.widget.Button;
 
 import com.example.huangyongwen.myapplication.utils.DatabaseHelper;
 import com.meizu.lastmile.LastmileClient;
+import com.meizu.lastmile.Utils.ShellUtils;
 
 public class Main2Activity extends Activity implements View.OnClickListener {
 
@@ -22,8 +23,11 @@ public class Main2Activity extends Activity implements View.OnClickListener {
     Button update = null;
     Button query = null;
     Button delete = null;
-    Button receiveTask = null;
-    Button runTask = null;
+    Button receivePingTask = null;
+    Button receivePageTask = null;
+    Button receiveFiledownloadTask = null;
+    Button runLocalTask = null;
+    Button myButton = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,8 +48,11 @@ public class Main2Activity extends Activity implements View.OnClickListener {
 
 
         //增加两个 接收任务 和 跑 任务
-        receiveTask = (Button) this.findViewById(R.id.receiveTask);
-        runTask = (Button) this.findViewById(R.id.runTask);
+        receivePingTask = (Button) this.findViewById(R.id.receivePingTask);
+        receivePageTask = (Button) this.findViewById(R.id.receivePageTask);
+        receiveFiledownloadTask = (Button) this.findViewById(R.id.receiveFiledownloadTask);
+        runLocalTask = (Button) this.findViewById(R.id.runLocalTask);
+        myButton = (Button) this.findViewById(R.id.myButton);
 
 
         //添加监听器
@@ -55,8 +62,11 @@ public class Main2Activity extends Activity implements View.OnClickListener {
         update.setOnClickListener(this);
         query.setOnClickListener(this);
         delete.setOnClickListener(this);
-        receiveTask.setOnClickListener(this);
-        runTask.setOnClickListener(this);
+        receivePingTask.setOnClickListener(this);
+        receivePageTask.setOnClickListener(this);
+        receiveFiledownloadTask.setOnClickListener(this);
+        runLocalTask.setOnClickListener(this);
+        myButton.setOnClickListener(this);
 
 
     }
@@ -121,51 +131,57 @@ public class Main2Activity extends Activity implements View.OnClickListener {
                 db6.delete("user", "id=?", new String[]{"1"});
                 break;
 
-            case R.id.receiveTask:
-
-                Log.i(SWORD, "接收任务》》》》》》");
-                String jsonString = "\n" +
-                        "{\n" +
-                        "\t\"taskId\": 1234566, \n" +
-                        "  \"taskType\": \"ping\",\n" +
-                        "\t\"groups\": [\n" +
-                        "\t\t{\n" +
-                        "\t\t\t\"idc\": \"ns\",\n" +
-                        "\t\t\t\"isp\": [\"telecom\", \"unicom\"],\n" +
-                        "\t\t\t\"cities\": [\n" +
-                        "\t\t\t\t\"zhuhai\",\n" +
-                        "\t\t\t\t\"guangzho\"\n" +
-                        "\t\t\t]\n" +
-                        "\t\t},\n" +
-                        "\t\t{\n" +
-                        "\t\t\t\"idc\": \"bj\",\n" +
-                        "\t\t\t\"isp\": [\"mobile\"],\n" +
-                        "\t\t\t\"cities\": [\n" +
-                        "\t\t\t\t\"beijing\",\n" +
-                        "\t\t\t\t\"tianjin\"\n" +
-                        "\t\t\t]\n" +
-                        "\t\t}\n" +
-                        "  ],\n" +
-                        "        \n" +
-                        "  \"host\": \"14.152.74.1\",\n" +
-                        "  \"timeout\": 10,\n" +
-                        "    \"size\": 32,\n" +
-                        "    \"count\": 4,\n" +
-                        "    \"tcpPing\": false,\n" +
-                        "    \"interval\": 0.2,\n" +
-                        "    \"supportIPv6\": 2,\n" +
-                        "    \"dnsMatch\": 0\n" +
+            case R.id.receivePingTask:
+                Log.i(SWORD, "接收本地ping任务》》》》》》");
+                String pingJsonString = "{\n" +
+                        "    \"taskId\":1234566,\n" +
+                        "    \"taskType\":\"ping\",\n" +
+                        "    \"groups\":[\n" +
+                        "        {\n" +
+                        "            \"idc\":\"ns\",\n" +
+                        "            \"isp\":[\n" +
+                        "                \"telecom\",\n" +
+                        "                \"unicom\"\n" +
+                        "            ],\n" +
+                        "            \"citis\":[\n" +
+                        "                \"zhuhai\",\n" +
+                        "                \"guangzho\"\n" +
+                        "            ]\n" +
+                        "        },\n" +
+                        "        {\n" +
+                        "            \"idc\":\"bj\",\n" +
+                        "            \"isp\":[\n" +
+                        "                \"mobile\"\n" +
+                        "            ],\n" +
+                        "            \"citis\":[\n" +
+                        "                \"beijing\",\n" +
+                        "                \"tianjin\"\n" +
+                        "            ]\n" +
+                        "        }\n" +
+                        "    ],\n" +
+                        "    \"host\":\"14.152.74.1\",\n" +
+                        "    \"monitorFrequency\":2,\n" +
+                        "    \"timeout\":10,\n" +
+                        "    \"size\":32,\n" +
+                        "    \"count\":4,\n" +
+                        "    \"tcpPing\":false,\n" +
+                        "    \"interval\":0.2,\n" +
+                        "    \"supportIPv6\":2,\n" +
+                        "    \"dnsMatch\":0,\n" +
+                        "    \"expireFrom\":\"2019-12-19 22:14:41\",\n" +
+                        "    \"expireTo\":\"2020-12-19 22:14:41\",\n" +
+                        "\t\"monitorFrequency\":12,\n" +
+                        "    \"isExecute\":false,\n" +
+                        "    \"executeTimeStart\":\"8\",\n" +
+                        "    \"executeTimeEnd\":\"12\"\n" +
                         "}";
-                new LastmileClient(Main2Activity.this).reviceInstructions(jsonString);
-                break;
-            case R.id.runTask:
-                Log.i(SWORD, "执行本地任务》》》》》》");
-                new LastmileClient(Main2Activity.this).startLocalTask(null);
+                new LastmileClient(Main2Activity.this).reviceInstructions(pingJsonString);
                 break;
 
 
             case R.id.receivePageTask:
-                String jsonPageString = "{\n" +
+                Log.i(SWORD, "执行本地page任务》》》》》》");
+                String pageJsobString = "{\n" +
                         "    \"taskId\":1234567,\n" +
                         "    \"taskType\":\"page\",\n" +
                         "    \"groups\":[\n" +
@@ -199,14 +215,77 @@ public class Main2Activity extends Activity implements View.OnClickListener {
                         "    ],\n" +
                         "    \"hijacking\":false,\n" +
                         "    \"expectContaining\":null,\n" +
-                        "    \"expireFrom\":\"2019-12-20 00:00:00\",\n" +
-                        "    \"expireTo\":\"2020-12-20 23:59:59\"\n" +
+                        "    \"expireFrom\":\"2019-12-19 22:14:41\",\n" +
+                        "    \"expireTo\":\"2020-12-19 22:14:41\",\n" +
+                        "\t\"monitorFrequency\":12,\n" +
+                        "    \"isExecute\":true,\n" +
+                        "    \"executeTimeStart\":\"8\",\n" +
+                        "    \"executeTimeEnd\":\"20\"\n" +
                         "}";
-                new LastmileClient(Main2Activity.this).reviceInstructions(jsonPageString);
+                new LastmileClient(Main2Activity.this).reviceInstructions(pageJsobString);
                 break;
 
-            case R.id.runPageTask:
+            case R.id.receiveFiledownloadTask:
+                Log.i(SWORD, "执行本地filedownload任务》》》》》》");
+                String fileDownloadJsonString = "{\n" +
+                        "    \"taskId\":89563,\n" +
+                        "    \"taskType\":\"download\",\n" +
+                        "    \"groups\":[\n" +
+                        "        {\n" +
+                        "            \"idc\":\"ns\",\n" +
+                        "            \"isp\":[\n" +
+                        "                \"telecom\",\n" +
+                        "                \"unicom\"\n" +
+                        "            ],\n" +
+                        "            \"cities\":[\n" +
+                        "                \"zhuhai\",\n" +
+                        "                \"guangzho\"\n" +
+                        "            ]\n" +
+                        "        },\n" +
+                        "        {\n" +
+                        "            \"idc\":\"bj\",\n" +
+                        "            \"isp\":[\n" +
+                        "                \"mobile\"\n" +
+                        "            ],\n" +
+                        "            \"cities\":[\n" +
+                        "                \"beijing\",\n" +
+                        "                \"tianjin\"\n" +
+                        "            ]\n" +
+                        "        }\n" +
+                        "    ],\n" +
+                        "    \"url\":\"https://nodejs.org/dist/latest-v10.x/win-x64/node_pdb.zip\",\n" +
+                        "    \"timeout\":120,\n" +
+                        "    \"useRedirect\":true,\n" +
+                        "    \"httpHeaders\":[\n" +
+                        "        \"User-Agent:mz-lastmile\"\n" +
+                        "    ],\n" +
+                        "    \"hijacking\":false,\n" +
+                        "    \"expectContaining\":null,\n" +
+                        "    \"expireFrom\":\"2019-12-19 22:14:41\",\n" +
+                        "    \"expireTo\":\"2020-5-19 22:14:41\",\n" +
+                        "    \"monitorFrequency\":1,\n" +
+                        "    \"isExecute\":true,\n" +
+                        "    \"executeTimeStart\":\"8\",\n" +
+                        "    \"executeTimeEnd\":\"12\"\n" +
+                        "}";
+                new LastmileClient(Main2Activity.this).reviceInstructions(fileDownloadJsonString);
+                break;
 
+            case R.id.runLocalTask:
+                Log.i(SWORD, "执行本地任务》》》》》》");
+                new LastmileClient(Main2Activity.this).startLocalTask(null);
+                break;
+
+            case R.id.myButton:
+//                ShellUtils.CommandResult commandResult =new  ShellUtils().execCommand("curl -L  -H 'User-Agent:mz-lastmile' --connect-timeout 5 --max-time 10 -o /dev/null -s -w  %{response_code}:%{content_type}:%{time_namelookup}:%{time_redirect}:%{num_redirects}:%{time_connect}:%{time_appconnect}:%{time_pretransfer}:%{time_starttransfer}:%{time_total}:%{size_header}:%{size_download}:%{speed_download}:'\\n' https://fms.res.meizu.com/dms/2020/05/08/041087f7-680e-40fe-a2cc-bcdb81931aa3.png"
+//                        ,false,true);
+
+                ShellUtils.CommandResult commandResult =new  ShellUtils().execCommand("ping -c 4 -s 32 -w 10 -i 0.2 14.152.74.1"
+                        ,false,true);
+
+                System.out.println(commandResult.successMsg);
+                System.out.println(commandResult.result);
+                System.out.println(commandResult.errorMsg);
 
             default:
                 Log.i(SWORD, "error");

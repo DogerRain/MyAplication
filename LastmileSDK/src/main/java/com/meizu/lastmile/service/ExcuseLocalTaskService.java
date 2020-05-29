@@ -10,6 +10,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.meizu.lastmile.Utils.CommonUtils;
 import com.meizu.lastmile.Utils.ConstantUtils;
 import com.meizu.lastmile.Utils.DatabaseHelper;
+import com.meizu.lastmile.Utils.ShellUtils;
 import com.meizu.lastmile.requestObj.Group;
 import com.meizu.lastmile.requestObj.Options;
 import com.meizu.lastmile.responseObj.PageResponseObject;
@@ -39,6 +40,7 @@ public class ExcuseLocalTaskService extends Thread {
 
     private String TAG = "LastMileSDK》》》 ExcuseLocalTaskService";
 
+
     private Context context;
     private String taskType;
     private String tableName;
@@ -67,6 +69,7 @@ public class ExcuseLocalTaskService extends Thread {
             //不存在证明用户可能清除了数据
             return;
         }
+        Log.i(TAG, "当前任务：" + taskType);
         //4.查询本地任务，把命令取出
         String[] selectColumnName = new String[]{"taskId", "taskType", "command", "lastExecuteTime", "expireFrom",
                 "expireTo", "groups", "monitorFrequency", "executeTimeStart", "executeTimeEnd", "isExecute"};
@@ -83,6 +86,7 @@ public class ExcuseLocalTaskService extends Thread {
                     long subHourExpireFrom = CommonUtils.getSecondeSub(CommonUtils.YYYY_MM_ddd_HH_mm_ss.parse(expireFrom), start);
                     long subHourExpireTo = CommonUtils.getSecondeSub(CommonUtils.YYYY_MM_ddd_HH_mm_ss.parse(expireTo), start);
                     if (subHourExpireFrom < 0 || subHourExpireTo > 0) {
+                        Log.i(TAG, taskType + "有效期已过，不执行");
                         continue;
                     }
                 }
@@ -91,12 +95,13 @@ public class ExcuseLocalTaskService extends Thread {
                 //判断是否首次
                 if (StringUtils.isNotBlank(lastExecuteTime)) {
                     Date last = CommonUtils.YYYY_MM_ddd_HH_mm_ss.parse(lastExecuteTime);
-                    long subHour = CommonUtils.getHourSub(start, last);
+                    long subHour = CommonUtils.getHourSub(last, start);
 //                    monitorFrequency为空表示执行
                     if (StringUtils.isNotBlank(hashmap.get("monitorFrequency"))) {
                         long monitorFrequency = Long.parseLong(hashmap.get("monitorFrequency"));
                         if (subHour < monitorFrequency) {
                             //频率之内，不执行
+                            Log.i(TAG, taskType + "频率之内，不执行");
                             continue;
                         }
                     }
@@ -113,6 +118,7 @@ public class ExcuseLocalTaskService extends Thread {
                         //1 表示在特定时间内执行
                         // executeTimeStartLong <= a < executeTimeEndLong      1:00 <= a < 3:00
                         if (now < executeTimeStartLong || now >= executeTimeEndLong) {
+                            Log.i(TAG, taskType + "不在规定时间内，不执行");
                             //不命中范围
                             continue;
                         }
@@ -120,36 +126,43 @@ public class ExcuseLocalTaskService extends Thread {
                         // 0 表示在特定的时间内不执行
                         if (now >= executeTimeStartLong && now < executeTimeEndLong + 1) {
                             //命中范围
+                            Log.i(TAG, taskType + "在规定时间内，不执行");
                             continue;
                         }
                     }
                 }
 
                 //options 与 group节点匹配
-                String groups = hashmap.get("group");
+                String groups = hashmap.get("groups");
                 if (StringUtils.isNotBlank(groups)) {
                     ArrayList<Group> groupArrayList = JSON.parseObject(groups, new TypeReference<ArrayList<Group>>() {
                     });
-                    for (Group group : groupArrayList){
-                        
+                    for (Group group : groupArrayList) {
+
                     }
                 }
 
-
                 //取command命令
-                String commad = hashmap.get("command") + "";
+                String commad = hashmap.get("command");
+                System.out.println(commad);
                 PingResponseObject pingResponseObject = new PingResponseObject();
                 PageResponseObject pageResponseObject = new PageResponseObject();
                 PageResponseObject downloadresponseObject = new PageResponseObject();
                 switch (taskType) {
                     case ConstantUtils.PING:
                         pingResponseObject = analysePingCommand(commad);
+                        Log.i(TAG, taskType + "执行成功，正在发送数据.....");
+                        System.out.println(pingResponseObject);
                         break;
                     case ConstantUtils.PAGE:
                         pageResponseObject = analyseCurlCommand(commad);
+                        Log.i(TAG, taskType + "执行成功，正在发送数据.....");
+                        System.out.println(pageResponseObject);
                         break;
                     case ConstantUtils.DOWNLOAD:
                         downloadresponseObject = analyseCurlCommand(commad);
+                        Log.i(TAG, taskType + "执行成功，正在发送数据.....");
+                        System.out.println(downloadresponseObject);
                         break;
                     default:
                         break;
@@ -160,7 +173,8 @@ public class ExcuseLocalTaskService extends Thread {
                 ContentValues values = new ContentValues();
                 values.put("lastExecuteTime", startString);
                 String whereClause = "taskId =? AND taskType =?";
-                dbHelper.update(db, ConstantUtils.T_TASK, values, whereClause, new String[]{hashmap.get("taskId") + ""});
+                dbHelper.update(db, tableName, values, whereClause, new String[]{hashmap.get("taskId"), taskType});
+                Log.i(TAG, taskType + "更新lastExecuteTime时间.....");
             } catch (ParseException e) {
                 Log.e(TAG, "日期转换失败", e);
             } catch (Exception e) {
@@ -194,6 +208,7 @@ public class ExcuseLocalTaskService extends Thread {
         PingResponseObject pingResponseObject = new PingResponseObject();
         pingResponseObject.setResultBuffer(resultStringBuffer);
         try {
+            Log.i(TAG, taskType + "exec ping start.");
             process = Runtime.getRuntime().exec(command);
             if (process == null) {
                 Log.e(TAG, "  fail:process is null.");
@@ -209,15 +224,14 @@ public class ExcuseLocalTaskService extends Thread {
             // 0 表示执行成功，有返回
             int status = process.waitFor();
             if (status == 0) {
-                Log.i(TAG, "exec cmd success:" + command);
+                Log.i(TAG, taskType + "exec ping success:");
                 append(pingResponseObject.getResultBuffer(), "exec cmd success:" + command);
                 pingResponseObject.setResult(true);
             } else {
-                Log.e(TAG, "exec cmd fail.");
+                Log.e(TAG, "exec ping fail.");
                 append(pingResponseObject.getResultBuffer(), "exec cmd fail.");
                 pingResponseObject.setResult(false);
             }
-            Log.i(TAG, "exec finished.");
             append(pingResponseObject.getResultBuffer(), "exec finished.");
 
         } catch (IOException e) {
@@ -225,7 +239,7 @@ public class ExcuseLocalTaskService extends Thread {
         } catch (InterruptedException e) {
             Log.e(TAG, String.valueOf(e));
         } finally {
-            Log.i(TAG, "command exit.");
+            Log.i(TAG, taskType + "exec ping exit.");
             if (process != null) {
                 process.destroy();
             }
@@ -241,48 +255,28 @@ public class ExcuseLocalTaskService extends Thread {
     }
 
     private PageResponseObject analyseCurlCommand(String command) {
-        String line = null;
-        Process process = null;
-        BufferedReader successReader = null;
-        StringBuffer resultStringBuffer = new StringBuffer("");
         PageResponseObject pageResponseObject = new PageResponseObject();
-        pageResponseObject.setResultBuffer(resultStringBuffer);
+        BufferedReader successReader = null;
+        pageResponseObject.setResultBuffer(new StringBuffer(""));
         try {
-            process = Runtime.getRuntime().exec(command);
-            if (process == null) {
-                Log.e(TAG, " curl fail:process is null.");
-                append(pageResponseObject.getResultBuffer(), "curl fail:process is null.");
+            Log.i(TAG, taskType + "exec curl start.");
+            ShellUtils.CommandResult commandResult = new ShellUtils().execCommand(command, false, true);
+            if (commandResult.result == -1) {
+                Log.i(TAG, taskType + "exec curl fail.");
+                append(pageResponseObject.getResultBuffer(), "curl fail --->>>" + command);
+                append(pageResponseObject.getResultBuffer(), commandResult.errorMsg);
                 pageResponseObject.setResult(false);
                 return pageResponseObject;
             }
-            successReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            while ((line = successReader.readLine()) != null) {
-                //规则解析
-                getCurlResultByMatchingRules(pageResponseObject, line);
-            }
-            // 0 表示执行成功，有返回
-            int status = process.waitFor();
-            if (status == 0) {
-                Log.i(TAG, "exec cmd success:" + command);
-                append(pageResponseObject.getResultBuffer(), "exec cmd success:" + command);
-                pageResponseObject.setResult(true);
-            } else {
-                Log.e(TAG, "exec cmd fail.");
-                append(pageResponseObject.getResultBuffer(), "exec cmd fail.");
-                pageResponseObject.setResult(false);
-            }
-            Log.i(TAG, "exec finished.");
-            append(pageResponseObject.getResultBuffer(), "exec finished.");
+            Log.i(TAG, taskType + "exec curl success.");
+            getCurlResultByMatchingRules(pageResponseObject, commandResult.successMsg);
+            append(pageResponseObject.getResultBuffer(), commandResult.successMsg);
+            pageResponseObject.setResult(true);
 
-        } catch (IOException e) {
-            Log.e(TAG, String.valueOf(e));
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             Log.e(TAG, String.valueOf(e));
         } finally {
-            Log.i(TAG, "curl exit.");
-            if (process != null) {
-                process.destroy();
-            }
+            Log.i(TAG, taskType + "exec exit.");
             if (successReader != null) {
                 try {
                     successReader.close();
@@ -348,9 +342,9 @@ public class ExcuseLocalTaskService extends Thread {
         speed_download:         784443.000
         */
         String[] values = line.split(":");
-        for (int i = 0; i < values.length; i++) {
-            System.out.println(ConstantUtils.PAGE_DOWNLOAD_KEY[i] + ":" + values[i]);
-        }
+//        for (int i = 0; i < values.length; i++) {
+//            System.out.println(ConstantUtils.PAGE_DOWNLOAD_KEY[i] + ":" + values[i]);
+//        }
         BigDecimal bigDecimal1024 = new BigDecimal("1024");
         BigDecimal bigDecimal1000 = new BigDecimal("1000");
 
@@ -361,10 +355,10 @@ public class ExcuseLocalTaskService extends Thread {
         pageResponseObject.setNumRedirects(values[4].trim());
 
 //        TCP建立连接的耗时 time_connect - time_namelookup   即 values[5].trim() -values[4].trim()
-        BigDecimal tcpConnectTime = new BigDecimal(values[5].trim()).subtract(new BigDecimal(values[4].trim())).multiply(bigDecimal1000).setScale(0);
+        BigDecimal tcpConnectTime = new BigDecimal(values[5].trim()).subtract(new BigDecimal(values[4].trim())).multiply(bigDecimal1000).setScale(0, BigDecimal.ROUND_HALF_UP);
         pageResponseObject.setTimeTCP(tcpConnectTime);
 //        ssl握手耗时  time_appconnect -time_connect
-        BigDecimal sslConnetcTime = new BigDecimal(values[6].trim()).subtract(new BigDecimal(values[5].trim())).multiply(bigDecimal1000).setScale(0);
+        BigDecimal sslConnetcTime = new BigDecimal(values[6].trim()).subtract(new BigDecimal(values[5].trim())).multiply(bigDecimal1000).setScale(0, BigDecimal.ROUND_HALF_UP);
         pageResponseObject.setTimeSSL(sslConnetcTime);
 
         //从开始到准备传输的时间
@@ -372,14 +366,14 @@ public class ExcuseLocalTaskService extends Thread {
         //首包时间（开始传输时间。在发出请求之后，Web 服务器返回数据的第一个字节所用的时间）
         pageResponseObject.setTimeStarttransfer(transformMSValue(values[8], bigDecimal1000));
         //客户端处理数据时间
-        BigDecimal clientTime = new BigDecimal(values[8].trim()).subtract(new BigDecimal(values[7].trim())).multiply(bigDecimal1000).setScale(0);
+        BigDecimal clientTime = new BigDecimal(values[8].trim()).subtract(new BigDecimal(values[7].trim())).multiply(bigDecimal1000).setScale(0, BigDecimal.ROUND_HALF_UP);
         pageResponseObject.setClientTime(clientTime);
 
         //总时间
         pageResponseObject.setTimeTotal(transformMSValue(values[9].trim(), bigDecimal1000));
 
         //downloadTime 内容下载时间 totaltime - time_pretransfer
-        BigDecimal downloadTime = new BigDecimal(values[9].trim()).subtract(new BigDecimal(values[7].trim())).multiply(bigDecimal1000).setScale(0);
+        BigDecimal downloadTime = new BigDecimal(values[9].trim()).subtract(new BigDecimal(values[7].trim())).multiply(bigDecimal1000).setScale(0, BigDecimal.ROUND_HALF_UP);
         pageResponseObject.setDownloadTime(downloadTime);
         BigDecimal siezHeader = new BigDecimal(values[10].trim()).divide(bigDecimal1024, 2, BigDecimal.ROUND_HALF_UP);
         pageResponseObject.setSizeHeader(siezHeader);
@@ -387,7 +381,6 @@ public class ExcuseLocalTaskService extends Thread {
         pageResponseObject.setSizeDownload(sizeDownload);
         BigDecimal speedDownload = new BigDecimal(values[12].trim()).divide(bigDecimal1024, 2, BigDecimal.ROUND_HALF_UP);
         pageResponseObject.setSpeedDownload(speedDownload);
-        pageResponseObject.setResult(true);
         return pageResponseObject;
     }
 
@@ -395,7 +388,7 @@ public class ExcuseLocalTaskService extends Thread {
         if (StringUtils.isBlank(value)) {
             return null;
         }
-        return new BigDecimal(value.trim()).multiply(bigDecimal).setScale(0);
+        return new BigDecimal(value.trim()).multiply(bigDecimal).setScale(0, BigDecimal.ROUND_HALF_UP);
     }
 
     public static void main(String[] args) {

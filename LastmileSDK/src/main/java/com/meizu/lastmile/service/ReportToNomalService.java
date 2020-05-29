@@ -7,6 +7,6 @@ package com.meizu.lastmile.service;
  * @Description 上报到大数据
  *
  */
-public class ReportToNomalService {
+public class ReportToNomalService  {
 
 }
