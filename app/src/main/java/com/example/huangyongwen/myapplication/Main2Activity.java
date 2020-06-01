@@ -12,6 +12,9 @@ import android.widget.Button;
 import com.example.huangyongwen.myapplication.utils.DatabaseHelper;
 import com.meizu.lastmile.LastmileClient;
 import com.meizu.lastmile.Utils.ShellUtils;
+import com.meizu.lastmile.constants.ConstantUtils;
+import com.meizu.lastmile.requestObj.Options;
+import com.meizu.statsapp.v3.PkgType;
 
 public class Main2Activity extends Activity implements View.OnClickListener {
 
@@ -75,7 +78,9 @@ public class Main2Activity extends Activity implements View.OnClickListener {
     public void onClick(View v) {
 // 判断所触发的被监听控件，并执行命令
         Log.i("Tag:", "监控点击事件");
-
+        Options options = new Options();
+        options.setIp("1.1.1.1");
+        LastmileClient.init(Main2Activity.this);
         switch (v.getId()) {
             //创建数据库
             case R.id.createDatabase:
@@ -175,7 +180,7 @@ public class Main2Activity extends Activity implements View.OnClickListener {
                         "    \"executeTimeStart\":\"8\",\n" +
                         "    \"executeTimeEnd\":\"12\"\n" +
                         "}";
-                new LastmileClient(Main2Activity.this).reviceInstructions(pingJsonString);
+                LastmileClient.getInstance().reviceInstructions(pingJsonString);
                 break;
 
 
@@ -222,7 +227,7 @@ public class Main2Activity extends Activity implements View.OnClickListener {
                         "    \"executeTimeStart\":\"8\",\n" +
                         "    \"executeTimeEnd\":\"20\"\n" +
                         "}";
-                new LastmileClient(Main2Activity.this).reviceInstructions(pageJsobString);
+                LastmileClient.getInstance().reviceInstructions(pageJsobString);
                 break;
 
             case R.id.receiveFiledownloadTask:
@@ -268,20 +273,20 @@ public class Main2Activity extends Activity implements View.OnClickListener {
                         "    \"executeTimeStart\":\"8\",\n" +
                         "    \"executeTimeEnd\":\"12\"\n" +
                         "}";
-                new LastmileClient(Main2Activity.this).reviceInstructions(fileDownloadJsonString);
+                LastmileClient.getInstance().reviceInstructions(fileDownloadJsonString);
                 break;
 
             case R.id.runLocalTask:
                 Log.i(SWORD, "执行本地任务》》》》》》");
-                new LastmileClient(Main2Activity.this).startLocalTask(null);
+                LastmileClient.getInstance().runLocalTaskAndReport("打开视频", "首页", PkgType.APP, ConstantUtils.TEST_APP_NOMAL_KEY, options);
                 break;
 
             case R.id.myButton:
 //                ShellUtils.CommandResult commandResult =new  ShellUtils().execCommand("curl -L  -H 'User-Agent:mz-lastmile' --connect-timeout 5 --max-time 10 -o /dev/null -s -w  %{response_code}:%{content_type}:%{time_namelookup}:%{time_redirect}:%{num_redirects}:%{time_connect}:%{time_appconnect}:%{time_pretransfer}:%{time_starttransfer}:%{time_total}:%{size_header}:%{size_download}:%{speed_download}:'\\n' https://fms.res.meizu.com/dms/2020/05/08/041087f7-680e-40fe-a2cc-bcdb81931aa3.png"
 //                        ,false,true);
 
-                ShellUtils.CommandResult commandResult =new  ShellUtils().execCommand("ping -c 4 -s 32 -w 10 -i 0.2 14.152.74.1"
-                        ,false,true);
+                ShellUtils.CommandResult commandResult = new ShellUtils().execCommand("ping -c 4 -s 32 -w 10 -i 0.2 14.152.74.1"
+                        , false, true);
 
                 System.out.println(commandResult.successMsg);
                 System.out.println(commandResult.result);

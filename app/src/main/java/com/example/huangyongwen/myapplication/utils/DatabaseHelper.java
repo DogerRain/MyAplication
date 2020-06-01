@@ -6,8 +6,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.util.Log;
 
-import com.meizu.lastmile.Utils.ConstantUtils;
-
 /**
  * @Author: huangyongwen
  * @CreateDate: 2020/5/18 15:55

@@ -12,7 +12,7 @@ import lombok.Data;
 @Data
 public class PageResponseObject {
     /**
-     * 总时间
+     * 总时间 单位为 ms ，以下均是 ms
      */
     BigDecimal timeTotal;
     /**
@@ -38,7 +38,7 @@ public class PageResponseObject {
     BigDecimal timeStarttransfer;
 
     /**
-     * 总下载字节数
+     * 总下载字节数 单位 KB ，以下均是KB
      */
     BigDecimal sizeDownload;
 
@@ -48,7 +48,7 @@ public class PageResponseObject {
     BigDecimal sizeHeader;
 
     /**
-     * 下载速度
+     * 下载速度 单位 KB/s
      */
     BigDecimal speedDownload;
     /**
@@ -88,9 +88,14 @@ public class PageResponseObject {
      */
     String usability;
 
-
+    /**
+     * true为执行成功，false为执行失败
+     */
     Boolean result;
-    StringBuffer resultBuffer;
 
+    /**
+     * 结果
+     */
+    StringBuffer resultBuffer;
 
 }

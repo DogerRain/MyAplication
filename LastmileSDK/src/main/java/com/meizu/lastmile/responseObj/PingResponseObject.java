@@ -10,10 +10,16 @@ import lombok.Data;
 @Data
 public class PingResponseObject {
     /**
-     * 平均延时
+     * 平均延时 单位为 ms ，以下均是 ms
      */
     String avgDelayedTime;
+    /**
+     * 最小延时
+     */
     String minDelayedTime;
+    /**
+     * 最大延时
+     */
     String maxDelayedTime;
     /**
      * 平均偏差
@@ -23,17 +29,19 @@ public class PingResponseObject {
      * 发送耗时
      */
     String sendUsedTime;
-
-
-
     /**
-     * 发送包，接收包，丢失率
+     * 发送包数，接收包数，丢失率（0~100，表示0%~100%）
      */
     String transmittedPackages;
     String receivedPackages;
     String packetLossRate;
 
+    /**
+     * true为执行成功，false为执行失败
+     */
     Boolean result;
+    /**
+     * 结果
+     */
     StringBuffer resultBuffer;
-
 }

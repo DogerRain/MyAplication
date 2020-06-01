@@ -6,11 +6,14 @@ import android.net.NetworkInfo;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Author: huangyongwen
@@ -111,12 +114,14 @@ public class CommonUtils {
     }
 
     public static long getHourSub(Date startDate, Date endDate) {
-        return (endDate.getTime() - startDate.getTime()) / ( 1 * 60 * 60 * 1000);
+        return (endDate.getTime() - startDate.getTime()) / (1 * 60 * 60 * 1000);
     }
+
     public static long getMinuteSub(Date startDate, Date endDate) {
         //返回分钟
         return (endDate.getTime() - startDate.getTime()) / (1 * 1 * 60 * 1000);
     }
+
     public static long getSecondeSub(Date startDate, Date endDate) {
         //返回秒
         return (endDate.getTime() - startDate.getTime()) / (1 * 1 * 1 * 1000);
@@ -134,6 +139,19 @@ public class CommonUtils {
         return calendar.get(Calendar.HOUR_OF_DAY);
     }
 
+    public static Map<String, String> objectToMap(Object obj) throws Exception {
+        if (obj == null) {
+            return null;
+        }
+        Map<String, String> map = new HashMap<String, String>();
+        Field[] declaredFields = obj.getClass().getDeclaredFields();
+        for (Field field : declaredFields) {
+            field.setAccessible(true);
+            map.put(field.getName(), field.get(obj) + "");
+        }
+        return map;
+    }
+
     public static int getHour(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
@@ -143,10 +161,10 @@ public class CommonUtils {
     public static void main(String[] args) {
         try {
             Date date = YYYY_MM_ddd_HH_mm_ss.parse("2020-05-26 16:11:30");
-            Date date1 =  YYYY_MM_ddd_HH_mm_ss.parse("2020-05-26 16:11:20");
-            Date date3 =  YYYY_MM_ddd_HH_mm_ss.parse("2020-05-26 00:11:20");
-            System.out.println(getHourSub(date,date1));
-            System.out.println(getSecondeSub(date,date1));
+            Date date1 = YYYY_MM_ddd_HH_mm_ss.parse("2020-05-26 16:11:20");
+            Date date3 = YYYY_MM_ddd_HH_mm_ss.parse("2020-05-26 00:11:20");
+            System.out.println(getHourSub(date, date1));
+            System.out.println(getSecondeSub(date, date1));
             System.out.println(getHour(date3));
         } catch (ParseException e) {
             e.printStackTrace();

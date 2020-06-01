@@ -1,5 +1,6 @@
 package com.meizu.lastmile.service;
 
+import android.app.Application;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -8,13 +9,14 @@ import android.util.Log;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.meizu.lastmile.Utils.CommonUtils;
-import com.meizu.lastmile.Utils.ConstantUtils;
 import com.meizu.lastmile.Utils.DatabaseHelper;
 import com.meizu.lastmile.Utils.ShellUtils;
+import com.meizu.lastmile.constants.ConstantUtils;
 import com.meizu.lastmile.requestObj.Group;
 import com.meizu.lastmile.requestObj.Options;
 import com.meizu.lastmile.responseObj.PageResponseObject;
 import com.meizu.lastmile.responseObj.PingResponseObject;
+import com.meizu.statsapp.v3.PkgType;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -36,9 +38,9 @@ import java.util.Map;
  * @Description 运行本地任务的公共类
  */
 
-public class ExcuseLocalTaskService extends Thread {
+public class ExcuseLocalTaskService {
 
-    private String TAG = "LastMileSDK》》》 ExcuseLocalTaskService";
+    private String TAG = Thread.currentThread().getName() + "--->>>LastMileSDK--->>> ExcuseLocalTaskService";
 
 
     private Context context;
@@ -46,17 +48,20 @@ public class ExcuseLocalTaskService extends Thread {
     private String tableName;
     private Options options;
 
-    public ExcuseLocalTaskService(Context context, String taskType, String tableName, Options options) {
+    private String eventName;
+    private String pageName;
+    PkgType pkgType;
+    String key;
+
+    public ExcuseLocalTaskService(Context context, String taskType, String tableName, Options options, String eventName, String pageName, PkgType pkgType, String key) {
         this.context = context;
         this.taskType = taskType;
         this.tableName = tableName;
         this.options = options;
-
-    }
-
-    @Override
-    public void run() {
-        excuseLocalTask();
+        this.eventName = eventName;
+        this.pageName = pageName;
+        this.pkgType = pkgType;
+        this.key = key;
     }
 
     public void excuseLocalTask() {
@@ -133,35 +138,36 @@ public class ExcuseLocalTaskService extends Thread {
                 }
 
                 //options 与 group节点匹配
-                String groups = hashmap.get("groups");
-                if (StringUtils.isNotBlank(groups)) {
-                    ArrayList<Group> groupArrayList = JSON.parseObject(groups, new TypeReference<ArrayList<Group>>() {
-                    });
-                    for (Group group : groupArrayList) {
-
-                    }
-                }
+//                String groups = hashmap.get("groups");
+//                if (StringUtils.isNotBlank(groups)) {
+//                    ArrayList<Group> groupArrayList = JSON.parseObject(groups, new TypeReference<ArrayList<Group>>() {
+//                    });
+//                    for (Group group : groupArrayList) {
+//
+//                    }
+//                }
 
                 //取command命令
                 String commad = hashmap.get("command");
                 System.out.println(commad);
-                PingResponseObject pingResponseObject = new PingResponseObject();
-                PageResponseObject pageResponseObject = new PageResponseObject();
-                PageResponseObject downloadresponseObject = new PageResponseObject();
+                ReportToNomalService reportToNomalService = new ReportToNomalService((Application) context.getApplicationContext(), pkgType, key);
                 switch (taskType) {
                     case ConstantUtils.PING:
-                        pingResponseObject = analysePingCommand(commad);
+                        PingResponseObject pingResponseObject = analysePingCommand(commad);
                         Log.i(TAG, taskType + "执行成功，正在发送数据.....");
+                        reportToNomalService.reportDataToNomal(eventName, pageName, pingResponseObject);
                         System.out.println(pingResponseObject);
                         break;
                     case ConstantUtils.PAGE:
-                        pageResponseObject = analyseCurlCommand(commad);
+                        PageResponseObject pageResponseObject = analyseCurlCommand(commad);
                         Log.i(TAG, taskType + "执行成功，正在发送数据.....");
+                        reportToNomalService.reportDataToNomal(eventName, pageName, pageResponseObject);
                         System.out.println(pageResponseObject);
                         break;
                     case ConstantUtils.DOWNLOAD:
-                        downloadresponseObject = analyseCurlCommand(commad);
+                        PageResponseObject downloadresponseObject = analyseCurlCommand(commad);
                         Log.i(TAG, taskType + "执行成功，正在发送数据.....");
+                        reportToNomalService.reportDataToNomal(eventName, pageName, downloadresponseObject);
                         System.out.println(downloadresponseObject);
                         break;
                     default:
@@ -185,7 +191,6 @@ public class ExcuseLocalTaskService extends Thread {
                 }
             }
         }
-
     }
 
     /**
@@ -365,7 +370,7 @@ public class ExcuseLocalTaskService extends Thread {
         pageResponseObject.setTimePretransfer(transformMSValue(values[7], bigDecimal1000));
         //首包时间（开始传输时间。在发出请求之后，Web 服务器返回数据的第一个字节所用的时间）
         pageResponseObject.setTimeStarttransfer(transformMSValue(values[8], bigDecimal1000));
-        //客户端处理数据时间
+        //客户端处理数据时间 time_starttransfer-time_pretransfer，
         BigDecimal clientTime = new BigDecimal(values[8].trim()).subtract(new BigDecimal(values[7].trim())).multiply(bigDecimal1000).setScale(0, BigDecimal.ROUND_HALF_UP);
         pageResponseObject.setClientTime(clientTime);
 

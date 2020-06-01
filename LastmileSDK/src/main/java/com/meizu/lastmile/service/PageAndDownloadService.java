@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
-import com.meizu.lastmile.Utils.ConstantUtils;
+import com.meizu.lastmile.constants.ConstantUtils;
 import com.meizu.lastmile.Utils.DatabaseHelper;
 import com.meizu.lastmile.requestObj.PageRequestObject;
 
@@ -22,7 +22,7 @@ import java.util.List;
 
 public class PageAndDownloadService extends Thread {
 
-    private String TAG = "LastMileSDK》》》 PageAndDownloadService";
+    private String TAG = Thread.currentThread().getName() + "--->>>LastMileSDK--->>> PageAndDownloadService";
 
     private Context context;
     private String jsonString;
@@ -181,9 +181,5 @@ public class PageAndDownloadService extends Thread {
                 db.close();
             }
         }
-    }
-
-    public static void main(String[] args) {
-
     }
 }

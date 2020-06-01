@@ -1,6 +1,7 @@
 package com.example.huangyongwen.myapplication;
 
 import android.app.Activity;
+import android.app.Application;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -34,6 +35,10 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.i(TAG, "OnCreate方法执行");
+        Application a = (Application) getApplicationContext();
+        System.out.println(a);
+        System.out.println(a);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //调用finish就会杀死activity，或者翻转屏幕;会调用onDestory
