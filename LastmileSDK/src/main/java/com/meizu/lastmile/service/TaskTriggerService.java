@@ -1,13 +1,23 @@
 package com.meizu.lastmile.service;
 
-        import android.content.Context;
+import android.content.Context;
+import android.util.Log;
 
-        import com.alibaba.fastjson.JSON;
-        import com.meizu.lastmile.Utils.CommonUtils;
-        import com.meizu.lastmile.constants.ConstantUtils;
-        import com.meizu.lastmile.requestObj.Instruction;
-        import com.meizu.lastmile.requestObj.Options;
-        import com.meizu.statsapp.v3.PkgType;
+import com.alibaba.fastjson.JSON;
+import com.meizu.lastmile.Utils.CommonUtils;
+import com.meizu.lastmile.constants.ConstantUtils;
+import com.meizu.lastmile.requestObj.Instruction;
+import com.meizu.lastmile.requestObj.Options;
+import com.meizu.statsapp.v3.PkgType;
+
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * @Author: huangyongwen
@@ -16,57 +26,63 @@ package com.meizu.lastmile.service;
  */
 
 public class TaskTriggerService {
-    private Context context;
-    private String jsonString;
-//    private Application application;
-//    private Options options;
-//    private PkgType pkgType;
-//    private String key;
-//    private String evetName;
+    private String TAG = Thread.currentThread().getName() + "--->>>LastMileSDK--->>> TaskTriggerService";
 
-    public TaskTriggerService(Context context, String jsonString) {
-        this.context = context;
-        this.jsonString = jsonString;
-    }
+    private Context context;
 
     public TaskTriggerService(Context context) {
         this.context = context;
     }
 
-//    private void TaskTriggerService(Options options, PkgType pkgType, String key, String evetName) {
-//        this.options = options;
-//        this.pkgType = pkgType;
-//        this.key = key;
-//        this.evetName = evetName;
-//    }
-
-
-    public void receiveTask() {
+    public void receiveTask(final String jsonString) {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                //起一个线程
-                Instruction instruction = JSON.parseObject(jsonString, Instruction.class);
-                String taskType = instruction.getTaskType();
-                switch (taskType) {
-                    case ConstantUtils.PING:
-                        PingService pingService = new PingService(jsonString, context);
-                        pingService.receiveInstructionAndStorage();
-                        break;
-                    case ConstantUtils.PAGE:
-                        PageAndDownloadService pageService = new PageAndDownloadService(jsonString, context);
-                        pageService.receiveInstructionAndStorage();
-                        break;
-                    case ConstantUtils.DOWNLOAD:
-                        PageAndDownloadService downloadService = new PageAndDownloadService(jsonString, context);
-                        downloadService.receiveInstructionAndStorage();
-                        break;
-                    default:
-                        break;
-                }
+                receiveTaskSynchronize(jsonString);
             }
         });
         thread.start();
+    }
+
+    private void receiveTaskSynchronize(String jsonString) {
+        Instruction instruction = JSON.parseObject(jsonString, Instruction.class);
+        String taskType = instruction.getTaskType();
+        if (StringUtils.isBlank(taskType)){
+            Log.i(TAG, "type错误");
+            return;
+        }
+        switch (taskType) {
+            case ConstantUtils.PING:
+                PingService pingService = new PingService(jsonString, context);
+                pingService.receiveInstructionAndStorage();
+                break;
+            case ConstantUtils.PAGE:
+                PageAndDownloadService pageService = new PageAndDownloadService(jsonString, context);
+                pageService.receiveInstructionAndStorage();
+                break;
+            case ConstantUtils.DOWNLOAD:
+                PageAndDownloadService downloadService = new PageAndDownloadService(jsonString, context);
+                downloadService.receiveInstructionAndStorage();
+                break;
+            default:
+                break;
+        }
+    }
+
+
+    public String getRemoteLastestTask() {
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder().url("https://meizitu.baimuxym.cn/meizitu/test")
+                .get().build();
+        Call call = client.newCall(request);
+        String lastestJsonString = "";
+        try {
+            Response response = call.execute();
+            lastestJsonString = response.body().string();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return lastestJsonString;
     }
 
 
@@ -74,12 +90,14 @@ public class TaskTriggerService {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
+                String lastestJsonString = getRemoteLastestTask();
+                receiveTaskSynchronize(lastestJsonString);
                 int flag = CommonUtils.getNetWorkStart(context);
                 switch (flag) {
                     case CommonUtils.NETWORW_WIFI:
                         startPingTask(eventName, pageName, pkgType, key, options);
-//                        startSingleWebTask(eventName, pageName, pkgType, key, options);
-//                        startFileDownloadTask(eventName, pageName, pkgType, key, options);
+                        startSingleWebTask(eventName, pageName, pkgType, key, options);
+                        startFileDownloadTask(eventName, pageName, pkgType, key, options);
                         break;
                     case CommonUtils.NETWORK_MOBILE:
                         startPingTask(eventName, pageName, pkgType, key, options);

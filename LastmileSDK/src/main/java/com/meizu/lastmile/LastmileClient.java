@@ -52,7 +52,7 @@ public class LastmileClient {
      * @param jsonString
      */
     public void reviceInstructions(String jsonString) {
-        new TaskTriggerService(context, jsonString).receiveTask();
+        new TaskTriggerService(context).receiveTask(jsonString);
     }
 
     /**
@@ -65,7 +65,8 @@ public class LastmileClient {
      * @param options   用户信息
      */
     public void runLocalTaskAndReport(String eventName, String pageName, PkgType pkgType, String key, Options options) {
-        new TaskTriggerService(context).startTask(eventName, pageName, pkgType, key, options);
+        TaskTriggerService taskTriggerService = new TaskTriggerService(context);
+        taskTriggerService.startTask(eventName, pageName, pkgType, key, options);
     }
 
 }

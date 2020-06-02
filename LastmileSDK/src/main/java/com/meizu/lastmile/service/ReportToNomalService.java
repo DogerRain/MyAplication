@@ -5,11 +5,13 @@ import android.app.Application;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.meizu.lastmile.Utils.CommonUtils;
+import com.meizu.lastmile.requestObj.Options;
 import com.meizu.lastmile.responseObj.PageResponseObject;
 import com.meizu.lastmile.responseObj.PingResponseObject;
 import com.meizu.statsapp.v3.PkgType;
 import com.meizu.statsapp.v3.UsageStatsProxy3;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -35,15 +37,22 @@ public class ReportToNomalService {
      * @param pageName  事件发生的页面，可以为空
      * @param object    对象
      */
-    public void reportDataToNomal(String eventName, String pageName, Object object) {
+    public void reportDataToNomal(String eventName, String pageName, Object object, Options options) {
         if (object == null) {
+            return;
+        }
+        if (true) {
             return;
         }
         try {
             UsageStatsProxy3.init(application, pkgType, pkgKey);
             UsageStatsProxy3 usageStatsProxy3 = UsageStatsProxy3.getInstance();
-            Map<String, String> map = CommonUtils.objectToMap(object);
-            usageStatsProxy3.onEventRealtime(eventName, pageName, map);
+            Map<String, String> map1 = CommonUtils.objectToMap(object);
+            Map<String, String> map2 = CommonUtils.objectToMap(options);
+            Map<String, String> combineResultMap = new HashMap<String, String>();
+            combineResultMap.putAll(map1);
+            combineResultMap.putAll(map2);
+            usageStatsProxy3.onEventRealtime(eventName, pageName, combineResultMap);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -51,12 +60,11 @@ public class ReportToNomalService {
 
     }
 
-
     public static void main(String[] args) throws Exception {
         PageResponseObject pageResponseObject = new PageResponseObject();
         PingResponseObject pingResponseObject = new PingResponseObject();
 
-        if (pageResponseObject==null){
+        if (pageResponseObject == null) {
             System.out.println("pageResponseObject is null ");
         }
 

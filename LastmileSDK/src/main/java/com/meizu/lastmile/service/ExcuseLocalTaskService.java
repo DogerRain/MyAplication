@@ -72,6 +72,7 @@ public class ExcuseLocalTaskService {
         //3 判断表是否存在
         if (!dbHelper.isTableExist(db, tableName)) {
             //不存在证明用户可能清除了数据
+            Log.i(TAG, "表不存在，退出。。。");
             return;
         }
         Log.i(TAG, "当前任务：" + taskType);
@@ -149,25 +150,24 @@ public class ExcuseLocalTaskService {
 
                 //取command命令
                 String commad = hashmap.get("command");
-                System.out.println(commad);
                 ReportToNomalService reportToNomalService = new ReportToNomalService((Application) context.getApplicationContext(), pkgType, key);
                 switch (taskType) {
                     case ConstantUtils.PING:
                         PingResponseObject pingResponseObject = analysePingCommand(commad);
                         Log.i(TAG, taskType + "执行成功，正在发送数据.....");
-                        reportToNomalService.reportDataToNomal(eventName, pageName, pingResponseObject);
+                        reportToNomalService.reportDataToNomal(eventName, pageName, pingResponseObject, options);
                         System.out.println(pingResponseObject);
                         break;
                     case ConstantUtils.PAGE:
                         PageResponseObject pageResponseObject = analyseCurlCommand(commad);
                         Log.i(TAG, taskType + "执行成功，正在发送数据.....");
-                        reportToNomalService.reportDataToNomal(eventName, pageName, pageResponseObject);
+                        reportToNomalService.reportDataToNomal(eventName, pageName, pageResponseObject, options);
                         System.out.println(pageResponseObject);
                         break;
                     case ConstantUtils.DOWNLOAD:
                         PageResponseObject downloadresponseObject = analyseCurlCommand(commad);
                         Log.i(TAG, taskType + "执行成功，正在发送数据.....");
-                        reportToNomalService.reportDataToNomal(eventName, pageName, downloadresponseObject);
+                        reportToNomalService.reportDataToNomal(eventName, pageName, downloadresponseObject, options);
                         System.out.println(downloadresponseObject);
                         break;
                     default:
@@ -205,6 +205,12 @@ public class ExcuseLocalTaskService {
         }
     }
 
+    /**
+     * @Author huangyongwen
+     * @CreateDate 2020/6/2 10:13
+     * @params command
+     * @Description 解析ping的结果
+     */
     private PingResponseObject analysePingCommand(String command) {
         String line = null;
         Process process = null;
@@ -222,6 +228,7 @@ public class ExcuseLocalTaskService {
                 return pingResponseObject;
             }
             successReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            append(pingResponseObject.getResultBuffer(), "command: " + command);
             while ((line = successReader.readLine()) != null) {
                 //规则解析
                 getPingResultByMatchingRules(pingResponseObject, line);
@@ -238,7 +245,6 @@ public class ExcuseLocalTaskService {
                 pingResponseObject.setResult(false);
             }
             append(pingResponseObject.getResultBuffer(), "exec finished.");
-
         } catch (IOException e) {
             Log.e(TAG, String.valueOf(e));
         } catch (InterruptedException e) {
@@ -259,21 +265,27 @@ public class ExcuseLocalTaskService {
         return pingResponseObject;
     }
 
+    /**
+     * @Author huangyongwen
+     * @CreateDate 2020/6/2 10:14
+     * @params command
+     * @Description 解析curl的结果
+     */
     private PageResponseObject analyseCurlCommand(String command) {
         PageResponseObject pageResponseObject = new PageResponseObject();
         BufferedReader successReader = null;
         pageResponseObject.setResultBuffer(new StringBuffer(""));
         try {
-            Log.i(TAG, taskType + "exec curl start.");
+            Log.i(TAG, taskType + " exec curl start.");
             ShellUtils.CommandResult commandResult = new ShellUtils().execCommand(command, false, true);
             if (commandResult.result == -1) {
-                Log.i(TAG, taskType + "exec curl fail.");
+                Log.i(TAG, taskType + " exec curl fail.");
                 append(pageResponseObject.getResultBuffer(), "curl fail --->>>" + command);
                 append(pageResponseObject.getResultBuffer(), commandResult.errorMsg);
                 pageResponseObject.setResult(false);
                 return pageResponseObject;
             }
-            Log.i(TAG, taskType + "exec curl success.");
+            Log.i(TAG, taskType + " exec curl success.");
             getCurlResultByMatchingRules(pageResponseObject, commandResult.successMsg);
             append(pageResponseObject.getResultBuffer(), commandResult.successMsg);
             pageResponseObject.setResult(true);
@@ -281,7 +293,7 @@ public class ExcuseLocalTaskService {
         } catch (Exception e) {
             Log.e(TAG, String.valueOf(e));
         } finally {
-            Log.i(TAG, taskType + "exec exit.");
+            Log.i(TAG, taskType + " exec exit.");
             if (successReader != null) {
                 try {
                     successReader.close();
@@ -295,8 +307,8 @@ public class ExcuseLocalTaskService {
 
 
     private PingResponseObject getPingResultByMatchingRules(PingResponseObject pingResponseObject, String line) {
+        append(pingResponseObject.getResultBuffer(), line);
         if (line.contains("ping: unknown host")) {
-            append(pingResponseObject.getResultBuffer(), line);
             pingResponseObject.setResult(false);
             return pingResponseObject;
         }
