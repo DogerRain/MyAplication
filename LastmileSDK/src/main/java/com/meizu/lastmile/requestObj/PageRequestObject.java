@@ -30,7 +30,7 @@ public class PageRequestObject extends Instruction {
     /**
      * 是否使用重定向
      */
-    int useRedirect = 1;
+    Boolean useRedirect = true;
 
     /**
      * 表头 可以有多个

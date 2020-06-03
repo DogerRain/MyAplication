@@ -27,7 +27,7 @@ public class PageAndDownloadService extends Thread {
     private Context context;
     private String jsonString;
 
-    public PageAndDownloadService(String jsonString, Context context ) {
+    public PageAndDownloadService(String jsonString, Context context) {
         this.context = context;
         this.jsonString = jsonString;
     }
@@ -89,7 +89,7 @@ public class PageAndDownloadService extends Thread {
 
         command.append("curl");
 
-        if (pageRequestObject.getUseRedirect() == 1) {
+        if (pageRequestObject.getUseRedirect()) {
             command.append(" -L ");
         }
 
@@ -167,7 +167,7 @@ public class PageAndDownloadService extends Thread {
                     String[] condition = new String[]{taskId, taskType};
                     String whereClause = "taskId =? AND taskType =?";
                     dbHelper.update(db, ConstantUtils.T_PAGE_DOWNLOAD, values, whereClause, condition);
-                }else {
+                } else {
                     Log.i(TAG, "任务不存在，插入任务》》》》》");
                     dbHelper.insert(db, ConstantUtils.T_PAGE_DOWNLOAD, values);
                 }

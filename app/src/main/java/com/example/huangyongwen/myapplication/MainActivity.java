@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.example.huangyongwen.myapplication.permission.PermissionsChecker;
 import com.example.huangyongwen.myapplication.utils.CommonUtil;
+import com.facebook.stetho.Stetho;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +37,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.i(TAG, "OnCreate方法执行");
+        Stetho.initializeWithDefaults(this);
         Application a = (Application) getApplicationContext();
         System.out.println(a);
         super.onCreate(savedInstanceState);

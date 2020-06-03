@@ -187,7 +187,7 @@ public class Main2Activity extends Activity implements View.OnClickListener {
             case R.id.receivePageTask:
                 Log.i(SWORD, "执行本地page任务》》》》》》");
                 String pageJsobString = "{\n" +
-                        "    \"taskId\":1234567,\n" +
+                        "    \"taskId\":565879625,\n" +
                         "    \"taskType\":\"page\",\n" +
                         "    \"groups\":[\n" +
                         "        {\n" +
@@ -213,19 +213,19 @@ public class Main2Activity extends Activity implements View.OnClickListener {
                         "        }\n" +
                         "    ],\n" +
                         "    \"url\":\"https://fms.res.meizu.com/dms/2020/05/08/041087f7-680e-40fe-a2cc-bcdb81931aa3.png\",\n" +
-                        "    \"timeout\":120,\n" +
+                        "    \"connectTimeout\":15,\n" +
+                        "    \"maxTimeout\":20,\n" +
                         "    \"useRedirect\":true,\n" +
                         "    \"httpHeaders\":[\n" +
                         "        \"User-Agent:mz-lastmile\"\n" +
                         "    ],\n" +
                         "    \"hijacking\":false,\n" +
-                        "    \"expectContaining\":null,\n" +
-                        "    \"expireFrom\":\"2019-12-19 22:14:41\",\n" +
-                        "    \"expireTo\":\"2020-12-19 22:14:41\",\n" +
-                        "\t\"monitorFrequency\":12,\n" +
+                        "    \"monitorFrequency\":\"\",\n" +
+                        "    \"expireFrom\":\"2019-12-20 00:00:00\",\n" +
+                        "    \"expireTo\":\"2020-12-20 23:59:59\",\n" +
                         "    \"isExecute\":true,\n" +
-                        "    \"executeTimeStart\":\"8\",\n" +
-                        "    \"executeTimeEnd\":\"20\"\n" +
+                        "    \"executeTimeStart\":\"0\",\n" +
+                        "    \"executeTimeEnd\":\"24\"\n" +
                         "}";
                 LastmileClient.getInstance().reviceInstructions(pageJsobString);
                 break;

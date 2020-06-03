@@ -82,60 +82,11 @@ public class ExcuseLocalTaskService {
         String slection = "taskType=?";
         String[] condition = new String[]{taskType};
         List<Map<String, String>> list = dbHelper.queryTask(db, tableName, selectColumnName, slection, condition);
+
         for (Map<String, String> hashmap : list) {
             try {
-                Date start = new Date();
-                //1 判断是否在有效期内
-                String expireFrom = hashmap.get("expireFrom");
-                String expireTo = hashmap.get("expireTo");
-                if (StringUtils.isNotBlank(expireFrom) && StringUtils.isNotBlank(expireTo)) {
-                    long subHourExpireFrom = CommonUtils.getSecondeSub(CommonUtils.YYYY_MM_ddd_HH_mm_ss.parse(expireFrom), start);
-                    long subHourExpireTo = CommonUtils.getSecondeSub(CommonUtils.YYYY_MM_ddd_HH_mm_ss.parse(expireTo), start);
-                    if (subHourExpireFrom < 0 || subHourExpireTo > 0) {
-                        Log.i(TAG, taskType + "有效期已过，不执行");
-                        continue;
-                    }
-                }
-                //2 . 判断上一次执行时间是否在频率之内
-                String lastExecuteTime = hashmap.get("lastExecuteTime");
-                //判断是否首次
-                if (StringUtils.isNotBlank(lastExecuteTime)) {
-                    Date last = CommonUtils.YYYY_MM_ddd_HH_mm_ss.parse(lastExecuteTime);
-                    long subHour = CommonUtils.getHourSub(last, start);
-//                    monitorFrequency为空表示执行
-                    if (StringUtils.isNotBlank(hashmap.get("monitorFrequency"))) {
-                        long monitorFrequency = Long.parseLong(hashmap.get("monitorFrequency"));
-                        if (subHour < monitorFrequency) {
-                            //频率之内，不执行
-                            Log.i(TAG, taskType + "频率之内，不执行");
-                            continue;
-                        }
-                    }
-                }
-                //取监控计划
-                String isExecute = hashmap.get("isExecute");
-                String executeTimeStart = hashmap.get("executeTimeStart");
-                String executeTimeEnd = hashmap.get("executeTimeEnd");
-                if (StringUtils.isNotBlank(isExecute) && StringUtils.isNotBlank(executeTimeStart) && StringUtils.isNotBlank(executeTimeEnd)) {
-                    int executeTimeStartLong = Integer.parseInt(executeTimeStart);
-                    int executeTimeEndLong = Integer.parseInt(executeTimeEnd);
-                    int now = CommonUtils.getHour(start);
-                    if (isExecute.equals("1")) {
-                        //1 表示在特定时间内执行
-                        // executeTimeStartLong <= a < executeTimeEndLong      1:00 <= a < 3:00
-                        if (now < executeTimeStartLong || now >= executeTimeEndLong) {
-                            Log.i(TAG, taskType + "不在规定时间内，不执行");
-                            //不命中范围
-                            continue;
-                        }
-                    } else {
-                        // 0 表示在特定的时间内不执行
-                        if (now >= executeTimeStartLong && now < executeTimeEndLong + 1) {
-                            //命中范围
-                            Log.i(TAG, taskType + "在规定时间内，不执行");
-                            continue;
-                        }
-                    }
+                if (!isExcuse(hashmap)) {
+                    continue;
                 }
 
                 //options 与 group节点匹配
@@ -147,42 +98,15 @@ public class ExcuseLocalTaskService {
 //
 //                    }
 //                }
-
-                //取command命令
-                String commad = hashmap.get("command");
-                ReportToNomalService reportToNomalService = new ReportToNomalService((Application) context.getApplicationContext(), pkgType, key);
-                switch (taskType) {
-                    case ConstantUtils.PING:
-                        PingResponseObject pingResponseObject = analysePingCommand(commad);
-                        Log.i(TAG, taskType + "执行成功，正在发送数据.....");
-                        reportToNomalService.reportDataToNomal(eventName, pageName, pingResponseObject, options);
-                        System.out.println(pingResponseObject);
-                        break;
-                    case ConstantUtils.PAGE:
-                        PageResponseObject pageResponseObject = analyseCurlCommand(commad);
-                        Log.i(TAG, taskType + "执行成功，正在发送数据.....");
-                        reportToNomalService.reportDataToNomal(eventName, pageName, pageResponseObject, options);
-                        System.out.println(pageResponseObject);
-                        break;
-                    case ConstantUtils.DOWNLOAD:
-                        PageResponseObject downloadresponseObject = analyseCurlCommand(commad);
-                        Log.i(TAG, taskType + "执行成功，正在发送数据.....");
-                        reportToNomalService.reportDataToNomal(eventName, pageName, downloadresponseObject, options);
-                        System.out.println(downloadresponseObject);
-                        break;
-                    default:
-                        break;
-                }
+                excuseTaskAndRepoet(hashmap);
 
 //                执行完成，更新上一次执行时间
-                String startString = CommonUtils.YYYY_MM_ddd_HH_mm_ss.format(start);
+                String startString = CommonUtils.YYYY_MM_ddd_HH_mm_ss.format(new Date());
                 ContentValues values = new ContentValues();
                 values.put("lastExecuteTime", startString);
                 String whereClause = "taskId =? AND taskType =?";
                 dbHelper.update(db, tableName, values, whereClause, new String[]{hashmap.get("taskId"), taskType});
                 Log.i(TAG, taskType + "更新lastExecuteTime时间.....");
-            } catch (ParseException e) {
-                Log.e(TAG, "日期转换失败", e);
             } catch (Exception e) {
                 Log.e(TAG, "未知错误", e);
             } finally {
@@ -190,6 +114,116 @@ public class ExcuseLocalTaskService {
                     db.close();
                 }
             }
+        }
+    }
+
+    public void excuseRemoteTask(Map<String, String> hashmap) {
+        if (!isExcuse(hashmap)) {
+            return;
+        }
+        excuseTaskAndRepoet(hashmap);
+    }
+
+
+    /**
+     * @Author huangyongwen
+     * @CreateDate 2020/6/3 17:25
+     * @params
+     * @Description 根据规则是否执行
+     */
+    private Boolean isExcuse(Map<String, String> hashmap) {
+        try {
+            Date start = new Date();
+            //1 判断是否在有效期内
+            String expireFrom = hashmap.get("expireFrom");
+            String expireTo = hashmap.get("expireTo");
+            if (StringUtils.isNotBlank(expireFrom) && StringUtils.isNotBlank(expireTo)) {
+                long subHourExpireFrom = CommonUtils.getSecondeSub(CommonUtils.YYYY_MM_ddd_HH_mm_ss.parse(expireFrom), start);
+                long subHourExpireTo = CommonUtils.getSecondeSub(CommonUtils.YYYY_MM_ddd_HH_mm_ss.parse(expireTo), start);
+                if (subHourExpireFrom < 0 || subHourExpireTo > 0) {
+                    Log.i(TAG, taskType + "有效期已过，不执行");
+                    return false;
+                }
+            }
+            //2 . 判断上一次执行时间是否在频率之内
+            String lastExecuteTime = hashmap.get("lastExecuteTime");
+            //判断是否首次
+            if (StringUtils.isNotBlank(lastExecuteTime)) {
+                Date last = CommonUtils.YYYY_MM_ddd_HH_mm_ss.parse(lastExecuteTime);
+                long subHour = CommonUtils.getHourSub(last, start);
+//                    monitorFrequency为空表示执行
+                if (StringUtils.isNotBlank(hashmap.get("monitorFrequency"))) {
+                    long monitorFrequency = Long.parseLong(hashmap.get("monitorFrequency"));
+                    if (subHour < monitorFrequency) {
+                        //频率之内，不执行
+                        Log.i(TAG, taskType + "频率之内，不执行");
+                        return false;
+                    }
+                }
+            }
+            //取监控计划
+            String isExecute = hashmap.get("isExecute");
+            String executeTimeStart = hashmap.get("executeTimeStart");
+            String executeTimeEnd = hashmap.get("executeTimeEnd");
+            if (StringUtils.isNotBlank(isExecute) && StringUtils.isNotBlank(executeTimeStart) && StringUtils.isNotBlank(executeTimeEnd)) {
+                int executeTimeStartLong = Integer.parseInt(executeTimeStart);
+                int executeTimeEndLong = Integer.parseInt(executeTimeEnd);
+                int now = CommonUtils.getHour(start);
+                if (isExecute.equals("1")) {
+                    //1 表示在特定时间内执行
+                    // executeTimeStartLong <= a < executeTimeEndLong      1:00 <= a < 3:00
+                    if (now < executeTimeStartLong || now >= executeTimeEndLong) {
+                        Log.i(TAG, taskType + "不在规定时间内，不执行");
+                        //不命中范围
+                        return false;
+                    }
+                } else {
+                    // 0 表示在特定的时间内不执行
+                    if (now >= executeTimeStartLong && now < executeTimeEndLong + 1) {
+                        //命中范围
+                        Log.i(TAG, taskType + "在规定时间内，不执行");
+                        return false;
+                    }
+                }
+            }
+        } catch (ParseException e) {
+            Log.e(TAG, "日期转换失败", e);
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @Author huangyongwen
+     * @CreateDate 2020/6/3 17:26
+     * @params
+     * @Description 执行命令并且上传到大数据
+     */
+    private void excuseTaskAndRepoet(Map<String, String> hashmap) {
+        //取command命令
+        String commad = hashmap.get("command");
+        ReportToNomalService reportToNomalService = new ReportToNomalService((Application) context.getApplicationContext(), pkgType, key);
+        switch (taskType) {
+            case ConstantUtils.PING:
+                PingResponseObject pingResponseObject = analysePingCommand(commad);
+                Log.i(TAG, taskType + "执行成功，正在发送数据.....");
+                reportToNomalService.reportDataToNomal(eventName, pageName, pingResponseObject, options);
+                System.out.println(pingResponseObject);
+                break;
+            case ConstantUtils.PAGE:
+                PageResponseObject pageResponseObject = analyseCurlCommand(commad);
+                Log.i(TAG, taskType + "执行成功，正在发送数据.....");
+                reportToNomalService.reportDataToNomal(eventName, pageName, pageResponseObject, options);
+                System.out.println(pageResponseObject);
+                break;
+            case ConstantUtils.DOWNLOAD:
+                PageResponseObject downloadresponseObject = analyseCurlCommand(commad);
+                Log.i(TAG, taskType + "执行成功，正在发送数据.....");
+                reportToNomalService.reportDataToNomal(eventName, pageName, downloadresponseObject, options);
+                System.out.println(downloadresponseObject);
+                break;
+            default:
+                break;
         }
     }
 
