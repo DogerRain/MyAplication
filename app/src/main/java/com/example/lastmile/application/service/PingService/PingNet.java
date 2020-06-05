@@ -1,4 +1,4 @@
-package com.example.huangyongwen.myapplication.service.PingService;
+package com.example.lastmile.application.service.PingService;
 
 /**
  * @Author： Administrator

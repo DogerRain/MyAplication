@@ -56,5 +56,5 @@ public class Instruction {
     String expireFrom;
     String expireTo;
 
-
+    int status = 1;
 }

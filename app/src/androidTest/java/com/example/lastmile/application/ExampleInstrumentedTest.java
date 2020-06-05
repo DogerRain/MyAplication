@@ -1,4 +1,4 @@
-package com.example.huangyongwen.myapplication;
+package com.example.lastmile.application;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

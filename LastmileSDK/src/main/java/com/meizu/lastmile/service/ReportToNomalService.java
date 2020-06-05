@@ -1,10 +1,12 @@
 package com.meizu.lastmile.service;
 
 import android.app.Application;
+import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.meizu.lastmile.Utils.CommonUtils;
+import com.meizu.lastmile.constants.ConstantUtils;
 import com.meizu.lastmile.requestObj.Options;
 import com.meizu.lastmile.responseObj.PageResponseObject;
 import com.meizu.lastmile.responseObj.PingResponseObject;
@@ -20,11 +22,10 @@ import java.util.Map;
  * @Description 上报到大数据
  */
 public class ReportToNomalService {
-
+    private String TAG = Thread.currentThread().getName() + "--->>>LastMileSDK--->>> ReportToNomalService";
     Application application;
     PkgType pkgType;
     String pkgKey;
-
     public ReportToNomalService(Application application, PkgType pkgType, String pkgKey) {
         this.application = application;
         this.pkgType = pkgType;
@@ -41,9 +42,6 @@ public class ReportToNomalService {
         if (object == null) {
             return;
         }
-        if (true) {
-            return;
-        }
         try {
             UsageStatsProxy3.init(application, pkgType, pkgKey);
             UsageStatsProxy3 usageStatsProxy3 = UsageStatsProxy3.getInstance();
@@ -52,7 +50,12 @@ public class ReportToNomalService {
             Map<String, String> combineResultMap = new HashMap<String, String>();
             combineResultMap.putAll(map1);
             combineResultMap.putAll(map2);
-            usageStatsProxy3.onEventRealtime(eventName, pageName, combineResultMap);
+//            System.out.println(combineResultMap);
+            if (ConstantUtils.SWITCH){
+                usageStatsProxy3.onEventRealtime(eventName, pageName, combineResultMap);
+                Log.i(TAG, "发送数据到nomal成功");
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }

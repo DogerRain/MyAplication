@@ -49,6 +49,7 @@ public class PingService {
         if (StringUtils.isBlank(pingRequestObject.getHost())
                 && StringUtils.isBlank(pingRequestObject.getHostName())
                 ) {
+            Log.i(TAG, "ping目标ip为空");
             return;
         }
 
@@ -64,6 +65,7 @@ public class PingService {
         String tableStructure = "create table " + ConstantUtils.T_PING + "(" +
                 "taskId varchar(50) PRIMARY KEY NOT NULL," +
                 "taskType varchar(50)," +
+                "taskName varchar(150)," +
                 "timeout varchar(10)," +
                 "count varchar(10)," +
                 "size varchar(10)," +
@@ -114,6 +116,7 @@ public class PingService {
             //像ContentValues中存放数据
             values.put("taskId", pingRequestObject.getTaskId());
             values.put("taskType", pingRequestObject.getTaskType());
+            values.put("taskName", pingRequestObject.getTaskName());
             values.put("timeout", pingRequestObject.getTimeout());
             values.put("count", pingRequestObject.getCount());
             values.put("size", pingRequestObject.getSize());
@@ -124,7 +127,7 @@ public class PingService {
             values.put("tcpPing", pingRequestObject.getTcpPing());
             values.put("supportIPv6", pingRequestObject.getSupportIPv6());
             values.put("dnsMatch", pingRequestObject.getDnsMatch());
-            values.put("lastExecuteTime", pingRequestObject.getLastExecuteTime());
+//            values.put("lastExecuteTime", pingRequestObject.getLastExecuteTime());
             values.put("expireFrom", pingRequestObject.getExpireFrom());
             values.put("expireTo", pingRequestObject.getExpireTo());
 
@@ -132,7 +135,7 @@ public class PingService {
             values.put("executeTimeStart", pingRequestObject.getExecuteTimeStart());
             values.put("executeTimeEnd", pingRequestObject.getExecuteTimeEnd());
             values.put("isExecute", pingRequestObject.getIsExecute());
-
+            values.put("status", pingRequestObject.getStatus());
 
             //2. 获取表是否存在，不存在则创建
             if (!dbHelper1.isTableExist(db1, ConstantUtils.T_PING)) {
@@ -148,7 +151,7 @@ public class PingService {
             Boolean IsHasTaskId = dbHelper1.queryTaskIdSQL(db1, ConstantUtils.T_PING, new String[]{"taskId"}, selection, placeholderValues);
             if (IsHasTaskId) {
                 //已经存在任务，更新任务
-                Log.i(TAG, "任务已存在，更新任务》》》》》");
+                Log.i(TAG, taskType + "任务已存在，更新任务》》》》》");
                 String[] condition = new String[]{taskId, taskType};
                 String whereClause = "taskId =? AND taskType =?";
                 dbHelper1.update(db1, ConstantUtils.T_PING, values, whereClause, condition);

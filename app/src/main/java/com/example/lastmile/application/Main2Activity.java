@@ -1,4 +1,4 @@
-package com.example.huangyongwen.myapplication;
+package com.example.lastmile.application;
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -9,7 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.example.huangyongwen.myapplication.utils.DatabaseHelper;
+import com.example.lastmile.application.utils.DatabaseHelper;
 import com.meizu.lastmile.LastmileClient;
 import com.meizu.lastmile.Utils.ShellUtils;
 import com.meizu.lastmile.constants.ConstantUtils;
@@ -233,7 +233,7 @@ public class Main2Activity extends Activity implements View.OnClickListener {
             case R.id.receiveFiledownloadTask:
                 Log.i(SWORD, "执行本地filedownload任务》》》》》》");
                 String fileDownloadJsonString = "{\n" +
-                        "    \"taskId\":89563,\n" +
+                        "    \"taskId\":1234568,\n" +
                         "    \"taskType\":\"download\",\n" +
                         "    \"groups\":[\n" +
                         "        {\n" +
@@ -242,7 +242,7 @@ public class Main2Activity extends Activity implements View.OnClickListener {
                         "                \"telecom\",\n" +
                         "                \"unicom\"\n" +
                         "            ],\n" +
-                        "            \"cities\":[\n" +
+                        "            \" cities\":[\n" +
                         "                \"zhuhai\",\n" +
                         "                \"guangzho\"\n" +
                         "            ]\n" +
@@ -258,20 +258,24 @@ public class Main2Activity extends Activity implements View.OnClickListener {
                         "            ]\n" +
                         "        }\n" +
                         "    ],\n" +
-                        "    \"url\":\"https://nodejs.org/dist/latest-v10.x/win-x64/node_pdb.zip\",\n" +
-                        "    \"timeout\":120,\n" +
+                        "    \"url\":\"http://mirrors.163.com/mysql/Downloads/MySQL-6.0/mysql-6.0.11-alpha.zip\",\n" +
+                        "    \"connectTimeout\":5,\n" +
+                        "    \"maxTimeout\":10,\n" +
                         "    \"useRedirect\":true,\n" +
                         "    \"httpHeaders\":[\n" +
                         "        \"User-Agent:mz-lastmile\"\n" +
                         "    ],\n" +
                         "    \"hijacking\":false,\n" +
-                        "    \"expectContaining\":null,\n" +
-                        "    \"expireFrom\":\"2019-12-19 22:14:41\",\n" +
-                        "    \"expireTo\":\"2020-5-19 22:14:41\",\n" +
-                        "    \"monitorFrequency\":1,\n" +
+                        "    \"expectHeaders\":[\n" +
+                        "        \"Custome-Header:hello world\"\n" +
+                        "    ],\n" +
+                        "    \"md5\":\"a957843erse828faui1o109pqik38821\",\n" +
+                        "    \"monitorFrequency\":\"12\",\n" +
+                        "    \"expireFrom\":\"2019-12-20 00:00:00\",\n" +
+                        "    \"expireTo\":\"2020-12-20 23:59:59\",\n" +
                         "    \"isExecute\":true,\n" +
-                        "    \"executeTimeStart\":\"8\",\n" +
-                        "    \"executeTimeEnd\":\"12\"\n" +
+                        "    \"executeTimeStart\":\"0\",\n" +
+                        "    \"executeTimeEnd\":\"24\"\n" +
                         "}";
                 LastmileClient.getInstance().reviceInstructions(fileDownloadJsonString);
                 break;

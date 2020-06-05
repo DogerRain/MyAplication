@@ -3,6 +3,7 @@ package com.meizu.lastmile.responseObj;
 import java.math.BigDecimal;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * @Author: huangyongwen
@@ -10,7 +11,11 @@ import lombok.Data;
  * @CreateDate:
  */
 @Data
-public class PageResponseObject {
+@EqualsAndHashCode(callSuper = true)
+public class PageResponseObject extends CommonResponseObject{
+    String taskId;
+    String taskName;
+    String taskType;
     /**
      * 总时间 单位为 ms ，以下均是 ms
      */

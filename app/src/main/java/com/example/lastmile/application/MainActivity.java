@@ -1,4 +1,4 @@
-package com.example.huangyongwen.myapplication;
+package com.example.lastmile.application;
 
 import android.app.Activity;
 import android.app.Application;
@@ -9,8 +9,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.example.huangyongwen.myapplication.permission.PermissionsChecker;
-import com.example.huangyongwen.myapplication.utils.CommonUtil;
+import com.example.lastmile.application.permission.PermissionsChecker;
+import com.example.lastmile.application.utils.CommonUtil;
 import com.facebook.stetho.Stetho;
 
 import java.util.HashMap;

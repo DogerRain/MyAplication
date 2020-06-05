@@ -18,7 +18,13 @@ public class ConstantUtils {
     public static String T_DOWLOAD = "t_download";
 
 
-    public static String TEST_APP_NOMAL_KEY ="1233";
+    public static String TEST_APP_NOMAL_KEY ="3JAH1B2FFS1R4X8AAX1ZFN02";
+
+//    public static String REMOTE_URL = "http://lastmile.meizu.com:8085/task/findall";
+    public static String REMOTE_URL = "http://172.16.44.103:8085/task/findall";
+
+
+    public static boolean SWITCH = true;
 
 
 

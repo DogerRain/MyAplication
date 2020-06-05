@@ -2,6 +2,7 @@
     package="lastmile.meizu.com.lastmile">
     <!--<ucom.example.huangyongwen.myapplication.service.permissionsion android:name="andrcom.example.huangyongwen.myapplication.service.permissionsion.WRITE_EXTERNAL_STORAGE" />-->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
 </manifest>
 
 

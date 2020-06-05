@@ -1,4 +1,4 @@
-package com.example.huangyongwen.myapplication;
+package com.example.lastmile.application;
 
 import org.junit.Test;
 

@@ -4,7 +4,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    tools:context="com.example.huangyongwen.myapplication.Main2Activity">
+    tools:context="com.example.lastmile.application.Main2Activity">
 
     <Button
         android:id="@+id/createDatabase"
@@ -80,6 +80,6 @@
         android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="TextView" />
+        android:text="" />
 
 </LinearLayout>

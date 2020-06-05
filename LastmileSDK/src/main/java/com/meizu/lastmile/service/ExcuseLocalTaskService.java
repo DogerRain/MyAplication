@@ -77,12 +77,11 @@ public class ExcuseLocalTaskService {
         }
         Log.i(TAG, "当前任务：" + taskType);
         //4.查询本地任务，把命令取出
-        String[] selectColumnName = new String[]{"taskId", "taskType", "command", "lastExecuteTime", "expireFrom",
-                "expireTo", "groups", "monitorFrequency", "executeTimeStart", "executeTimeEnd", "isExecute"};
+        String[] selectColumnName = new String[]{"taskId", "taskType","taskName", "command", "lastExecuteTime", "expireFrom",
+                "expireTo", "groups", "monitorFrequency", "executeTimeStart", "executeTimeEnd", "isExecute", "status"};
         String slection = "taskType=?";
         String[] condition = new String[]{taskType};
         List<Map<String, String>> list = dbHelper.queryTask(db, tableName, selectColumnName, slection, condition);
-
         for (Map<String, String> hashmap : list) {
             try {
                 if (!isExcuse(hashmap)) {
@@ -98,7 +97,7 @@ public class ExcuseLocalTaskService {
 //
 //                    }
 //                }
-                excuseTaskAndRepoet(hashmap);
+                excuseTaskAndReport(hashmap);
 
 //                执行完成，更新上一次执行时间
                 String startString = CommonUtils.YYYY_MM_ddd_HH_mm_ss.format(new Date());
@@ -117,13 +116,6 @@ public class ExcuseLocalTaskService {
         }
     }
 
-    public void excuseRemoteTask(Map<String, String> hashmap) {
-        if (!isExcuse(hashmap)) {
-            return;
-        }
-        excuseTaskAndRepoet(hashmap);
-    }
-
 
     /**
      * @Author huangyongwen
@@ -133,6 +125,10 @@ public class ExcuseLocalTaskService {
      */
     private Boolean isExcuse(Map<String, String> hashmap) {
         try {
+            String status = hashmap.get("status");
+            if (status.equals("0")) {
+                return false;
+            }
             Date start = new Date();
             //1 判断是否在有效期内
             String expireFrom = hashmap.get("expireFrom");
@@ -199,28 +195,37 @@ public class ExcuseLocalTaskService {
      * @params
      * @Description 执行命令并且上传到大数据
      */
-    private void excuseTaskAndRepoet(Map<String, String> hashmap) {
+    private void excuseTaskAndReport(Map<String, String> hashmap) {
         //取command命令
         String commad = hashmap.get("command");
         ReportToNomalService reportToNomalService = new ReportToNomalService((Application) context.getApplicationContext(), pkgType, key);
         switch (taskType) {
             case ConstantUtils.PING:
                 PingResponseObject pingResponseObject = analysePingCommand(commad);
+                pingResponseObject.setTaskId(hashmap.get("taskId"));
+                pingResponseObject.setTaskType(hashmap.get("taskType"));
+                pingResponseObject.setTaskName(hashmap.get("taskName"));
                 Log.i(TAG, taskType + "执行成功，正在发送数据.....");
                 reportToNomalService.reportDataToNomal(eventName, pageName, pingResponseObject, options);
-                System.out.println(pingResponseObject);
+                Log.i(TAG, "打印Objetc:" + pingResponseObject);
                 break;
             case ConstantUtils.PAGE:
                 PageResponseObject pageResponseObject = analyseCurlCommand(commad);
+                pageResponseObject.setTaskId(hashmap.get("taskId"));
+                pageResponseObject.setTaskType(hashmap.get("taskType"));
+                pageResponseObject.setTaskName(hashmap.get("taskName"));
                 Log.i(TAG, taskType + "执行成功，正在发送数据.....");
                 reportToNomalService.reportDataToNomal(eventName, pageName, pageResponseObject, options);
-                System.out.println(pageResponseObject);
+                Log.i(TAG, "打印Objetc:" + pageResponseObject);
                 break;
             case ConstantUtils.DOWNLOAD:
                 PageResponseObject downloadresponseObject = analyseCurlCommand(commad);
+                downloadresponseObject.setTaskId(hashmap.get("taskId"));
+                downloadresponseObject.setTaskType(hashmap.get("taskType"));
+                downloadresponseObject.setTaskName(hashmap.get("taskName"));
                 Log.i(TAG, taskType + "执行成功，正在发送数据.....");
                 reportToNomalService.reportDataToNomal(eventName, pageName, downloadresponseObject, options);
-                System.out.println(downloadresponseObject);
+                Log.i(TAG, "打印Objetc:" + downloadresponseObject);
                 break;
             default:
                 break;
@@ -249,36 +254,39 @@ public class ExcuseLocalTaskService {
         String line = null;
         Process process = null;
         BufferedReader successReader = null;
-        StringBuffer resultStringBuffer = new StringBuffer("");
+        StringBuffer resultStringBuffer = new StringBuffer("command--->>>\n");
         PingResponseObject pingResponseObject = new PingResponseObject();
-        pingResponseObject.setResultBuffer(resultStringBuffer);
         try {
             Log.i(TAG, taskType + "exec ping start.");
             process = Runtime.getRuntime().exec(command);
+            //执行命令
+            append(resultStringBuffer, command);
+            append(resultStringBuffer,"result---->>>");
             if (process == null) {
                 Log.e(TAG, "  fail:process is null.");
-                append(pingResponseObject.getResultBuffer(), " fail:process is null.");
+                append(resultStringBuffer, " fail:process is null.");
+                pingResponseObject.setResultBuffer(resultStringBuffer);
                 pingResponseObject.setResult(false);
                 return pingResponseObject;
             }
             successReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            append(pingResponseObject.getResultBuffer(), "command: " + command);
             while ((line = successReader.readLine()) != null) {
                 //规则解析
                 getPingResultByMatchingRules(pingResponseObject, line);
+                append(resultStringBuffer,line);
             }
             // 0 表示执行成功，有返回
             int status = process.waitFor();
             if (status == 0) {
                 Log.i(TAG, taskType + "exec ping success:");
-                append(pingResponseObject.getResultBuffer(), "exec cmd success:" + command);
+                append(resultStringBuffer, "exec ping success");
                 pingResponseObject.setResult(true);
             } else {
                 Log.e(TAG, "exec ping fail.");
-                append(pingResponseObject.getResultBuffer(), "exec cmd fail.");
+                append(resultStringBuffer, "exec cmd fail.");
                 pingResponseObject.setResult(false);
             }
-            append(pingResponseObject.getResultBuffer(), "exec finished.");
+            pingResponseObject.setResultBuffer(resultStringBuffer);
         } catch (IOException e) {
             Log.e(TAG, String.valueOf(e));
         } catch (InterruptedException e) {
@@ -308,26 +316,31 @@ public class ExcuseLocalTaskService {
     private PageResponseObject analyseCurlCommand(String command) {
         PageResponseObject pageResponseObject = new PageResponseObject();
         BufferedReader successReader = null;
-        pageResponseObject.setResultBuffer(new StringBuffer(""));
+        StringBuffer resultStringBuffer = new StringBuffer("command--->>>\n");
+        //执行命令
+        append(resultStringBuffer, command);
+        append(resultStringBuffer,"result---->>>");
         try {
             Log.i(TAG, taskType + " exec curl start.");
             ShellUtils.CommandResult commandResult = new ShellUtils().execCommand(command, false, true);
             if (commandResult.result == -1) {
                 Log.i(TAG, taskType + " exec curl fail.");
-                append(pageResponseObject.getResultBuffer(), "curl fail --->>>" + command);
-                append(pageResponseObject.getResultBuffer(), commandResult.errorMsg);
+                append(resultStringBuffer, " curl exec fail ");
+                append(resultStringBuffer, commandResult.errorMsg);
+                pageResponseObject.setResultBuffer(resultStringBuffer);
                 pageResponseObject.setResult(false);
                 return pageResponseObject;
             }
             Log.i(TAG, taskType + " exec curl success.");
+            append(resultStringBuffer,commandResult.successMsg);
+            append(resultStringBuffer," exec curl success.");
+            pageResponseObject.setResultBuffer(resultStringBuffer);
             getCurlResultByMatchingRules(pageResponseObject, commandResult.successMsg);
-            append(pageResponseObject.getResultBuffer(), commandResult.successMsg);
             pageResponseObject.setResult(true);
-
         } catch (Exception e) {
             Log.e(TAG, String.valueOf(e));
         } finally {
-            Log.i(TAG, taskType + " exec exit.");
+            Log.i(TAG, taskType + " exec curl exit.");
             if (successReader != null) {
                 try {
                     successReader.close();
@@ -341,7 +354,6 @@ public class ExcuseLocalTaskService {
 
 
     private PingResponseObject getPingResultByMatchingRules(PingResponseObject pingResponseObject, String line) {
-        append(pingResponseObject.getResultBuffer(), line);
         if (line.contains("ping: unknown host")) {
             pingResponseObject.setResult(false);
             return pingResponseObject;
@@ -383,7 +395,7 @@ public class ExcuseLocalTaskService {
         time_namelookup:        0.125
         time_redirect:          0.000
         num_redirects:          0
-        time_connect:           0.135
+        time_connect:           0.135   5
         time_appconnect:        0.252   6
         time_pretransfer:       0.252
         time_starttransfer:     0.329
@@ -408,9 +420,13 @@ public class ExcuseLocalTaskService {
 //        TCP建立连接的耗时 time_connect - time_namelookup   即 values[5].trim() -values[4].trim()
         BigDecimal tcpConnectTime = new BigDecimal(values[5].trim()).subtract(new BigDecimal(values[4].trim())).multiply(bigDecimal1000).setScale(0, BigDecimal.ROUND_HALF_UP);
         pageResponseObject.setTimeTCP(tcpConnectTime);
-//        ssl握手耗时  time_appconnect -time_connect
-        BigDecimal sslConnetcTime = new BigDecimal(values[6].trim()).subtract(new BigDecimal(values[5].trim())).multiply(bigDecimal1000).setScale(0, BigDecimal.ROUND_HALF_UP);
-        pageResponseObject.setTimeSSL(sslConnetcTime);
+//        ssl握手耗时  time_appconnect -time_connect, 如果time_appconnect = 0 ,表示使用http
+        if (new BigDecimal(values[6].trim()).compareTo(BigDecimal.ZERO) == 0) {
+            pageResponseObject.setTimeSSL(BigDecimal.ZERO);
+        } else {
+            BigDecimal sslConnetcTime = new BigDecimal(values[6].trim()).subtract(new BigDecimal(values[5].trim())).multiply(bigDecimal1000).setScale(0, BigDecimal.ROUND_HALF_UP);
+            pageResponseObject.setTimeSSL(sslConnetcTime);
+        }
 
         //从开始到准备传输的时间
         pageResponseObject.setTimePretransfer(transformMSValue(values[7], bigDecimal1000));
@@ -457,6 +473,16 @@ public class ExcuseLocalTaskService {
         for (Group group : groupArrayList) {
             System.out.println(group);
         }
+        PageResponseObject pageResponseObject = new PageResponseObject();
+        if (new BigDecimal("000.000".trim()).compareTo(BigDecimal.ZERO) == 0) {
+            pageResponseObject.setTimeSSL(BigDecimal.ZERO);
+            System.out.println("确实是0000");
+        }
+        System.out.println(pageResponseObject.getTimeSSL());
 
+        StringBuffer stringBuffer  = new StringBuffer("1111");
+        append(stringBuffer,"--->>>123");
+        append(stringBuffer,"--->>>123");
+        System.out.println(stringBuffer);
     }
 }

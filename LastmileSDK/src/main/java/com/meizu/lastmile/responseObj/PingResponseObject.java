@@ -1,6 +1,7 @@
 package com.meizu.lastmile.responseObj;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * @Author: huangyongwen
@@ -8,7 +9,11 @@ import lombok.Data;
  * @CreateDate:
  */
 @Data
-public class PingResponseObject {
+@EqualsAndHashCode(callSuper = true)
+public class PingResponseObject extends CommonResponseObject{
+    String taskId;
+    String taskName;
+    String taskType;
     /**
      * 平均延时 单位为 ms ，以下均是 ms
      */

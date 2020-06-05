@@ -62,6 +62,7 @@ public class PageAndDownloadService extends Thread {
         String tableStructure = "create table " + ConstantUtils.T_PAGE_DOWNLOAD + "(" +
                 "taskId varchar(50) PRIMARY KEY NOT NULL," +
                 "taskType varchar(50)," +
+                "taskName varchar(150)," +
                 "url varchar(500)," +
                 "connectTimeout varchar(10)," +
                 "maxTimeout varchar(10)," +
@@ -116,8 +117,6 @@ public class PageAndDownloadService extends Thread {
 
         command.append(pageRequestObject.getUrl());
 
-        System.out.println(command);
-
         //入库
         //1. 获取本地数据库
         DatabaseHelper dbHelper = new DatabaseHelper(context);
@@ -129,6 +128,7 @@ public class PageAndDownloadService extends Thread {
             //像ContentValues中存放数据
             values.put("taskId", taskId);
             values.put("taskType", pageRequestObject.getTaskType());
+            values.put("taskName", pageRequestObject.getTaskName());
 //            values.put("connectTimeout", pageRequestObject.getConnectTimeout());
 //            values.put("maxTimeout", pageRequestObject.getMaxTimeout());
 //            values.put("useRedirect", pageRequestObject.getUseRedirect());
@@ -139,7 +139,7 @@ public class PageAndDownloadService extends Thread {
 
             values.put("expectContaining", pageRequestObject.getExpectContaining());
 
-            values.put("lastExecuteTime", pageRequestObject.getLastExecuteTime());
+//            values.put("lastExecuteTime", pageRequestObject.getLastExecuteTime());
             values.put("expireFrom", pageRequestObject.getExpireFrom());
             values.put("expireTo", pageRequestObject.getExpireTo());
 
@@ -147,6 +147,7 @@ public class PageAndDownloadService extends Thread {
             values.put("executeTimeStart", pageRequestObject.getExecuteTimeStart());
             values.put("executeTimeEnd", pageRequestObject.getExecuteTimeEnd());
             values.put("isExecute", pageRequestObject.getIsExecute());
+            values.put("status", pageRequestObject.getStatus());
 
 
             //2. 获取表是否存在，不存在则创建
@@ -163,7 +164,7 @@ public class PageAndDownloadService extends Thread {
                 Boolean IsHasTaskId = dbHelper.queryTaskIdSQL(db, ConstantUtils.T_PAGE_DOWNLOAD, new String[]{"taskId"}, selection, placeholderValues);
                 if (IsHasTaskId) {
                     //已经存在任务，更新任务
-                    Log.i(TAG, "任务已存在，更新任务》》》》》");
+                    Log.i(TAG, taskType + "任务已存在，更新任务》》》》》");
                     String[] condition = new String[]{taskId, taskType};
                     String whereClause = "taskId =? AND taskType =?";
                     dbHelper.update(db, ConstantUtils.T_PAGE_DOWNLOAD, values, whereClause, condition);

@@ -1,4 +1,4 @@
-package com.example.huangyongwen.myapplication.permission;
+package com.example.lastmile.application.permission;
 
 import android.app.Activity;
 import android.content.pm.PackageManager;

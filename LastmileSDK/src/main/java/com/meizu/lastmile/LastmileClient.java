@@ -66,7 +66,7 @@ public class LastmileClient {
      */
     public void runLocalTaskAndReport(String eventName, String pageName, PkgType pkgType, String key, Options options) {
         TaskTriggerService taskTriggerService = new TaskTriggerService(context);
-        taskTriggerService.startTask(eventName, pageName, pkgType, key, options);
+        taskTriggerService.startLocalTask(eventName, pageName, pkgType, key, options);
     }
 
 }
