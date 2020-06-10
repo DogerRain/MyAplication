@@ -14,11 +14,11 @@ public class Options {
      */
     String ip;
     /**
-     * 运营商 （电信、移动、联通、其他）、可为空
+     * 运营商 （电信、移动、联通、其他）,可为空
      */
     String operation;
     /**
-     * 用户位置、可为空
+     * 用户位置,可为空
      */
     String location;
 

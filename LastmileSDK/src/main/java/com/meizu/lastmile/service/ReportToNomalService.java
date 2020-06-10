@@ -45,14 +45,16 @@ public class ReportToNomalService {
         try {
             UsageStatsProxy3.init(application, pkgType, pkgKey);
             UsageStatsProxy3 usageStatsProxy3 = UsageStatsProxy3.getInstance();
-            Map<String, String> map1 = CommonUtils.objectToMap(object);
-            Map<String, String> map2 = CommonUtils.objectToMap(options);
+            Map<String, String> map1 = CommonUtils.jsonObjectToMap(object);
+            Map<String, String> map2 = CommonUtils.jsonObjectToMap(options);
             Map<String, String> combineResultMap = new HashMap<String, String>();
             combineResultMap.putAll(map1);
             combineResultMap.putAll(map2);
 //            System.out.println(combineResultMap);
             if (ConstantUtils.SWITCH){
+//                usageStatsProxy3.onEvent(eventName, pageName, combineResultMap);
                 usageStatsProxy3.onEventRealtime(eventName, pageName, combineResultMap);
+//                usageStatsProxy3.onEventNeartime(eventName, pageName, combineResultMap);
                 Log.i(TAG, "发送数据到nomal成功");
             }
 

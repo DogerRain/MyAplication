@@ -4,6 +4,9 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
@@ -139,6 +142,13 @@ public class CommonUtils {
         return calendar.get(Calendar.HOUR_OF_DAY);
     }
 
+    /**
+     * object转map，继承类失效
+     *
+     * @param obj
+     * @return
+     * @throws Exception
+     */
     public static Map<String, String> objectToMap(Object obj) throws Exception {
         if (obj == null) {
             return null;
@@ -150,6 +160,24 @@ public class CommonUtils {
             map.put(field.getName(), field.get(obj) + "");
         }
         return map;
+    }
+
+
+    public static Map<String, String> jsonObjectToMap(Object obj) {
+        String rest = JSON.toJSONString(obj, SerializerFeature.QuoteFieldNames, SerializerFeature.WriteMapNullValue);
+        Map<String, String> map = JSON.parseObject(rest, Map.class);
+        Map<String, String> mapAll = new HashMap<>();
+
+        for (String key : map.keySet()) {
+            String value = String.valueOf(map.get(key));
+            if (value.equals("null")) {
+                mapAll.put(key, "");
+            } else {
+                mapAll.put(key, value);
+            }
+
+        }
+        return mapAll;
     }
 
     public static int getHour(Date date) {

@@ -11,9 +11,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class PingResponseObject extends CommonResponseObject{
-    String taskId;
-    String taskName;
-    String taskType;
+
     /**
      * 平均延时 单位为 ms ，以下均是 ms
      */
@@ -41,12 +39,7 @@ public class PingResponseObject extends CommonResponseObject{
     String receivedPackages;
     String packetLossRate;
 
-    /**
-     * true为执行成功，false为执行失败
-     */
-    Boolean result;
-    /**
-     * 结果
-     */
-    StringBuffer resultBuffer;
+
+
+
 }

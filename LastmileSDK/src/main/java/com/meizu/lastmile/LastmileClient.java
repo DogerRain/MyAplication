@@ -60,13 +60,12 @@ public class LastmileClient {
      *
      * @param eventName 事件名称
      * @param pageName  事件发生的页面，可以为空
-     * @param pkgType   app类型
      * @param key       nomal平台的 key
      * @param options   用户信息
      */
-    public void runLocalTaskAndReport(String eventName, String pageName, PkgType pkgType, String key, Options options) {
+    public void runLocalTaskAndReport(String eventName, String pageName, String key, Options options) {
         TaskTriggerService taskTriggerService = new TaskTriggerService(context);
-        taskTriggerService.startLocalTask(eventName, pageName, pkgType, key, options);
+        taskTriggerService.startLocalTask(eventName, pageName,  PkgType.APP, key, options);
     }
 
 }

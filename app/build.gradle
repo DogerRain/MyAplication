@@ -4,7 +4,7 @@ android {
     defaultConfig {
         applicationId "com.example.lastmile.application"
         minSdkVersion 18
-        targetSdkVersion 29
+        targetSdkVersion 19
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -65,8 +65,8 @@ dependencies {
     //    dependencies {
     //        compile(name:'app-release', ext:'aar')
     //    }
-    //        compile(name: 'LastmileSDK-release', ext: 'aar')
-    compile project(path: ':LastmileSDK')
+//    compile(group: 'com.meizu.statsapp', name: 'MzUsageStats', version: '3.3.2', ext: 'aar')
     implementation 'com.facebook.stetho:stetho:1.3.1'
+    compile project(path: ':LastmileSDK')
 }
 

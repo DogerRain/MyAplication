@@ -14,7 +14,6 @@ import com.meizu.lastmile.LastmileClient;
 import com.meizu.lastmile.Utils.ShellUtils;
 import com.meizu.lastmile.constants.ConstantUtils;
 import com.meizu.lastmile.requestObj.Options;
-import com.meizu.statsapp.v3.PkgType;
 
 public class Main2Activity extends Activity implements View.OnClickListener {
 
@@ -282,7 +281,7 @@ public class Main2Activity extends Activity implements View.OnClickListener {
 
             case R.id.runLocalTask:
                 Log.i(SWORD, "执行本地任务》》》》》》");
-                LastmileClient.getInstance().runLocalTaskAndReport("打开视频", "首页", PkgType.APP, ConstantUtils.TEST_APP_NOMAL_KEY, options);
+                LastmileClient.getInstance().runLocalTaskAndReport("打开视频", "首页", ConstantUtils.TEST_APP_NOMAL_KEY, options);
                 break;
 
             case R.id.myButton:

@@ -1,5 +1,7 @@
 package com.meizu.lastmile.responseObj;
 
+import com.meizu.lastmile.Utils.CommonUtils;
+
 import java.math.BigDecimal;
 
 import lombok.Data;
@@ -13,9 +15,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class PageResponseObject extends CommonResponseObject{
-    String taskId;
-    String taskName;
-    String taskType;
+
     /**
      * 总时间 单位为 ms ，以下均是 ms
      */
@@ -93,14 +93,12 @@ public class PageResponseObject extends CommonResponseObject{
      */
     String usability;
 
-    /**
-     * true为执行成功，false为执行失败
-     */
-    Boolean result;
+    public static void main(String[] args) {
+        PageResponseObject pageResponseObject = new PageResponseObject();
+        pageResponseObject.setUsability("1");
+        pageResponseObject.setResult(true);
 
-    /**
-     * 结果
-     */
-    StringBuffer resultBuffer;
+        System.out.println(CommonUtils.jsonObjectToMap(pageResponseObject));
+    }
 
 }

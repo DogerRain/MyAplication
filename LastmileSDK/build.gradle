@@ -5,7 +5,7 @@ android {
     compileSdkVersion 29
     defaultConfig {
         minSdkVersion 18
-        targetSdkVersion 29
+        targetSdkVersion 19
         versionCode 1
         versionName "1.0"
 
@@ -33,6 +33,12 @@ android {
     }
 }
 
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support.constraint:constraint-layout:1.1.3'
@@ -47,16 +53,13 @@ dependencies {
         resolutionStrategy.force 'com.android.support:support-annotations:26.1.0'
     }
     compile 'com.squareup.okhttp3:okhttp:3.9.0'
-    //    compile 'com.meizu.flyme.internet:gslb-okhttp2:2.2.1'
-    compile 'com.meizu.statsapp:MzUsageStats:3.2.5@aar'
+//            compile 'com.meizu.statsapp:MzUsageStats:3.2.5@aar'
+    compile(group: 'com.meizu.statsapp', name: 'MzUsageStats', version: '3.2.5', ext: 'aar')
+//    compile(group: 'com.meizu.statsapp', name: 'MzUsageStats', version: '3.3.2', ext: 'aar')
     compile 'org.projectlombok:lombok:1.16.6'
-    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     compile 'org.apache.commons:commons-lang3:3.1'
-    // https://mvnrepository.com/artifact/com.alibaba/fastjson
     compile 'com.alibaba:fastjson:1.2.62'
-    //    compile 'com.meizu.common.ip:ip-seeking:1.0.7-RC07'
-    //    compile(group: 'com.meizu.flyme.sdk', name: 'meizu-common', version: '4.0.11', ext: 'aar')
+//    compile(name: 'MzUsageStats-3.3.2', ext: 'aar')
 }
 
 

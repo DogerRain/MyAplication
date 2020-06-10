@@ -77,6 +77,12 @@ allprojects {
     }
 }
 
+repositories {
+    flatDir {
+        dirs project(':LastmileSDK').file('libs')
+    }
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }

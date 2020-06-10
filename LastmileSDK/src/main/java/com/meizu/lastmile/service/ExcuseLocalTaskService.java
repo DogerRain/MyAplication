@@ -199,12 +199,14 @@ public class ExcuseLocalTaskService {
         //取command命令
         String commad = hashmap.get("command");
         ReportToNomalService reportToNomalService = new ReportToNomalService((Application) context.getApplicationContext(), pkgType, key);
+        String startString = CommonUtils.YYYY_MM_ddd_HH_mm_ss.format(new Date());
         switch (taskType) {
             case ConstantUtils.PING:
                 PingResponseObject pingResponseObject = analysePingCommand(commad);
                 pingResponseObject.setTaskId(hashmap.get("taskId"));
                 pingResponseObject.setTaskType(hashmap.get("taskType"));
                 pingResponseObject.setTaskName(hashmap.get("taskName"));
+                pingResponseObject.setExcuseCommandTime(startString);
                 Log.i(TAG, taskType + "执行成功，正在发送数据.....");
                 reportToNomalService.reportDataToNomal(eventName, pageName, pingResponseObject, options);
                 Log.i(TAG, "打印Objetc:" + pingResponseObject);
@@ -214,6 +216,7 @@ public class ExcuseLocalTaskService {
                 pageResponseObject.setTaskId(hashmap.get("taskId"));
                 pageResponseObject.setTaskType(hashmap.get("taskType"));
                 pageResponseObject.setTaskName(hashmap.get("taskName"));
+                pageResponseObject.setExcuseCommandTime(startString);
                 Log.i(TAG, taskType + "执行成功，正在发送数据.....");
                 reportToNomalService.reportDataToNomal(eventName, pageName, pageResponseObject, options);
                 Log.i(TAG, "打印Objetc:" + pageResponseObject);
@@ -223,6 +226,7 @@ public class ExcuseLocalTaskService {
                 downloadresponseObject.setTaskId(hashmap.get("taskId"));
                 downloadresponseObject.setTaskType(hashmap.get("taskType"));
                 downloadresponseObject.setTaskName(hashmap.get("taskName"));
+                downloadresponseObject.setExcuseCommandTime(startString);
                 Log.i(TAG, taskType + "执行成功，正在发送数据.....");
                 reportToNomalService.reportDataToNomal(eventName, pageName, downloadresponseObject, options);
                 Log.i(TAG, "打印Objetc:" + downloadresponseObject);
@@ -284,7 +288,7 @@ public class ExcuseLocalTaskService {
             } else {
                 Log.e(TAG, "exec ping fail.");
                 append(resultStringBuffer, "exec cmd fail.");
-                pingResponseObject.setResult(false);
+                pingResponseObject.setResult(true);
             }
             pingResponseObject.setResultBuffer(resultStringBuffer);
         } catch (IOException e) {
