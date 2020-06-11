@@ -50,7 +50,6 @@ public class ReportToNomalService {
             Map<String, String> combineResultMap = new HashMap<String, String>();
             combineResultMap.putAll(map1);
             combineResultMap.putAll(map2);
-//            System.out.println(combineResultMap);
             if (ConstantUtils.SWITCH){
 //                usageStatsProxy3.onEvent(eventName, pageName, combineResultMap);
                 usageStatsProxy3.onEventRealtime(eventName, pageName, combineResultMap);

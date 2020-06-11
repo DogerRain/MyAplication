@@ -7,13 +7,13 @@
     tools:context="com.example.lastmile.application.MainActivity">
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/getIP"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="76dp"
-        android:text="Button"
+        android:text="获取ip"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -27,7 +27,7 @@
         android:textAllCaps="false" />
 
     <Button
-        android:id="@+id/button4"
+        android:id="@+id/buttonGo"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginBottom="8dp"
@@ -39,6 +39,23 @@
         app:layout_constraintVertical_bias="0.725"
         tools:layout_editor_absoluteX="16dp" />
 
+
+    <TextView
+        android:id="@+id/textViewIP"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="12"
+        android:textSize="30dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.359"
+        tools:text="12" />
 
     <TextView
         android:id="@+id/textView2"
@@ -55,5 +72,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="@string/helloWorld" />
+
+
 
 </android.support.constraint.ConstraintLayout>

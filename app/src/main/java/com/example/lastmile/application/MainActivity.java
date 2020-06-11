@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.example.lastmile.application.permission.PermissionsChecker;
 import com.example.lastmile.application.utils.CommonUtil;
+import com.meizu.lastmile.Utils.IPUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,8 +24,8 @@ public class MainActivity extends Activity {
     String[] permsLocation = {"android.permission.READ_EXTERNAL_STORAGE",
             "android.permission.WRITE_EXTERNAL_STORAGE"};
 
-    Button button2, button4;
-    TextView textView2;
+    Button buttonGo, buttonPermissiom, buttonIP;
+    TextView textView2, textViewIP;
 
     //    private PermissionsCheckerB mPermissionsCheckerB; // 权限检测器
 //    private PermissionsChecker permissionsChecker; // 权限检测器
@@ -42,15 +43,17 @@ public class MainActivity extends Activity {
         //调用finish就会杀死activity，或者翻转屏幕;会调用onDestory
 //        finish();
 //
-        button2 = findViewById(R.id.btn_request_permission);
-        button4 = findViewById(R.id.button4);
-        Button button3 = findViewById(R.id.button2);
-        textView2 = findViewById(R.id.textView2);
+        buttonPermissiom = findViewById(R.id.btn_request_permission);
+        buttonGo = findViewById(R.id.buttonGo);
 
+        textView2 = findViewById(R.id.textView2);
+        textViewIP = findViewById(R.id.textViewIP);
+
+        buttonIP = findViewById(R.id.getIP);
 
         permissionsChecker = new PermissionsChecker(MainActivity.this);
 
-        button2.setOnClickListener(new View.OnClickListener() {
+        buttonPermissiom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 //                String s = textView2.getText().toString();
@@ -91,40 +94,24 @@ public class MainActivity extends Activity {
 
         });
 
-        button3.setOnClickListener(new View.OnClickListener() {
+        buttonIP.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-        /*        String userid = CommonUtil.getSettingNote(MainActivity.this, "userinfo", "userid");
-                String userpwd = CommonUtil.getSettingNote(MainActivity.this, "userinfo", "userpwd");
-                Log.d("userid:", "userId:" + userid);
-                Log.d("userpwd:", "userpwd:" + userpwd);
-                textView2.setText(userid + "|" + userpwd);*/
-/*
-                OkHttpClient.Builder builder = GslbOkClientBuilderFactory.newBuilder(new GslbManager(MainActivity.this));
-//在这里，你可以继续通过builder设置你的client
-                OkHttpClient client = builder.build();
-//                client
-                client.dns();
-                client.authenticator();
 
+                String ip = IPUtils.getIpAddress(MainActivity.this);
 
-                GslbManager manager = new GslbManager(MainActivity.this);
-                IpInfo ipInfo = manager.convert("your-domain");
-                if (ipInfo != null) {
-                    String ip = ipInfo.getIp();
-//                    int code =  getHttpResponseCode("your-domain", ip);//getHttpResponseCode是你使用ip得到的响应码
-//                    ipInfo.onResponseCode(code);
-                }*/
+                textViewIP.setText(ip);
 
 
             }
         });
 
-        button4.setOnClickListener(new View.OnClickListener() {
+
+        buttonGo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 //                new PingNet().start();
-                Log.i(TAG, "按道理进入方法了");
+                Log.i(TAG, "跳转");
                 Intent intent = new Intent();
                 //setClass函数的第一个参数是一个Context对象
                 //Context是一个类，Activity是Context类的子类，也就是说，所有的Activity对象，都可以向上转型为Context对象

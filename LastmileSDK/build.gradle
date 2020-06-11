@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-//apply plugin: 'com.meizu.configer'
 
 android {
     compileSdkVersion 29
@@ -53,17 +52,11 @@ dependencies {
         resolutionStrategy.force 'com.android.support:support-annotations:26.1.0'
     }
     compile 'com.squareup.okhttp3:okhttp:3.9.0'
-//            compile 'com.meizu.statsapp:MzUsageStats:3.2.5@aar'
     compile(group: 'com.meizu.statsapp', name: 'MzUsageStats', version: '3.2.5', ext: 'aar')
-//    compile(group: 'com.meizu.statsapp', name: 'MzUsageStats', version: '3.3.2', ext: 'aar')
     compile 'org.projectlombok:lombok:1.16.6'
     compile 'org.apache.commons:commons-lang3:3.1'
     compile 'com.alibaba:fastjson:1.2.62'
-//    compile(name: 'MzUsageStats-3.3.2', ext: 'aar')
 }
-
-
-
 
 
 task makeJar(type:Copy) {
